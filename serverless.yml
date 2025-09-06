@@ -1,0 +1,98 @@
+service: apna-management
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  region: ap-south-1
+  runtime: provided.al2
+  environment:
+    APP_ENV: ${sls:stage}
+    APP_NAME: ${ssm:/apna/${sls:stage}/APP_NAME}
+    APP_STORAGE: /tmp
+    APP_KEY: ${ssm:/apna/${sls:stage}/APP_KEY}
+    APP_DEBUG: ${ssm:/apna/${sls:stage}/APP_DEBUG}
+
+    # App
+    APP_LOCALE: en
+    APP_FALLBACK_LOCALE: en
+    APP_FAKER_LOCALE: en_US
+    APP_MAINTENANCE_STORE: database
+    BCRYPT_ROUNDS: 12
+
+    # Logging
+    LOG_CHANNEL: errorlog
+    LOG_LEVEL: warning
+
+    # Session
+    SESSION_DRIVER: ${ssm:/apna/${sls:stage}/SESSION_DRIVER}
+    SESSION_LIFETIME: 120
+    SESSION_ENCRYPT: false
+    SESSION_PATH: /
+    SESSION_DOMAIN: null
+
+    # Database
+    DB_CONNECTION: ${ssm:/apna/${sls:stage}/DB_CONNECTION}
+    DB_HOST: ${ssm:/apna/${sls:stage}/DB_HOST}
+    DB_PORT: ${ssm:/apna/${sls:stage}/DB_PORT}
+    DB_DATABASE: ${ssm:/apna/${sls:stage}/DB_DATABASE}
+    DB_USERNAME: ${ssm:/apna/${sls:stage}/DB_USERNAME}
+    DB_PASSWORD: ${ssm:/apna/${sls:stage}/DB_PASSWORD}
+
+    # Cache / Queue
+    CACHE_DRIVER: ${ssm:/apna/${sls:stage}/CACHE_DRIVER}
+    CACHE_PREFIX: ${ssm:/apna/${sls:stage}/CACHE_PREFIX}
+    QUEUE_CONNECTION: ${ssm:/apna/${sls:stage}/QUEUE_CONNECTION}
+
+    # Mail
+    MAIL_MAILER: ${ssm:/apna/${sls:stage}/MAIL_MAILER}
+    MAIL_HOST: ${ssm:/apna/${sls:stage}/MAIL_HOST}
+    MAIL_PORT: ${ssm:/apna/${sls:stage}/MAIL_PORT}
+    MAIL_USERNAME: ${ssm:/apna/${sls:stage}/MAIL_USERNAME}
+    MAIL_PASSWORD: ${ssm:/apna/${sls:stage}/MAIL_PASSWORD}
+    MAIL_ENCRYPTION: ${ssm:/apna/${sls:stage}/MAIL_ENCRYPTION}
+    MAIL_FROM_ADDRESS: ${ssm:/apna/${sls:stage}/MAIL_FROM_ADDRESS}
+    MAIL_FROM_NAME: ${ssm:/apna/${sls:stage}/MAIL_FROM_NAME}
+
+    # Filesystem / S3
+    FILESYSTEM_DRIVER: ${ssm:/apna/${sls:stage}/FILESYSTEM_DRIVER}
+    AWS_ACCESS_KEY_ID: ${ssm:/apna/${sls:stage}/AWS_ACCESS_KEY_ID}
+    AWS_SECRET_ACCESS_KEY: ${ssm:/apna/${sls:stage}/AWS_SECRET_ACCESS_KEY}
+    AWS_DEFAULT_REGION: ${ssm:/apna/${sls:stage}/AWS_DEFAULT_REGION}
+    AWS_BUCKET: ${ssm:/apna/${sls:stage}/AWS_BUCKET}
+    AWS_URL: ${ssm:/apna/${sls:stage}/AWS_URL}
+
+plugins:
+  - ./vendor/bref/bref
+
+functions:
+  web:
+    handler: public/index.php
+    timeout: 28
+    layers:
+      - ${bref:layer.php-82-fpm}
+    events:
+      - httpApi: '*'
+
+  artisan:
+    handler: artisan
+    timeout: 120
+    layers:
+      - ${bref:layer.php-82}
+
+resources:
+  Resources:
+    LambdaExecutionRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: apna-management-lambda-role
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service: lambda.amazonaws.com
+              Action: sts:AssumeRole
+        ManagedPolicyArns:
+          - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+          - arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess

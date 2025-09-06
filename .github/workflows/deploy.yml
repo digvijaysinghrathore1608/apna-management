@@ -1,0 +1,52 @@
+name: Deploy Apna Management
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Choose environment to deploy'
+        required: true
+        default: 'stage'
+        type: choice
+        options:
+          - stage
+          - prod
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+
+      - name: Install Dependencies
+        run: composer install --no-dev --optimize-autoloader
+
+      - name: Install Serverless
+        run: npm install -g serverless
+
+      - name: Configure AWS
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Deploy Lambda
+        run: serverless deploy --stage=${{ github.event.inputs.environment }}
+
+      - name: Run Migrations
+        run: |
+          echo "WARNING: migrating DB for ${{ github.event.inputs.environment }}"
+          read -p "Type YES to continue migration: " confirm
+          if [ "$confirm" != "YES" ]; then
+            echo "Migration aborted"
+            exit 1
+          fi
+          npx serverless bref:cli --stage=${{ github.event.inputs.environment }} -- --args="migrate --force"

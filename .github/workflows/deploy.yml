@@ -12,6 +12,11 @@ on:
           - stage
           - prod
 
+      confirm_migration:
+        description: 'Type YES to run migration'
+        required: true
+        default: 'NO'    
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -41,12 +46,15 @@ jobs:
       - name: Deploy Lambda
         run: serverless deploy --stage=${{ github.event.inputs.environment }}
 
+      # - name: Run Migrations
+      #   run: |
+      #     echo "WARNING: migrating DB for ${{ github.event.inputs.environment }}"
+      #     read -p "Type YES to continue migration: " confirm
+      #     if [ "$confirm" != "YES" ]; then
+      #       echo "Migration aborted"
+      #       exit 1
+      #     fi
+      #     npx serverless bref:cli --stage=${{ github.event.inputs.environment }} -- --args="migrate --force"
       - name: Run Migrations
-        run: |
-          echo "WARNING: migrating DB for ${{ github.event.inputs.environment }}"
-          read -p "Type YES to continue migration: " confirm
-          if [ "$confirm" != "YES" ]; then
-            echo "Migration aborted"
-            exit 1
-          fi
-          npx serverless bref:cli --stage=${{ github.event.inputs.environment }} -- --args="migrate --force"
+        if: ${{ github.event.inputs.confirm_migration == 'YES' }}
+        run: npx serverless bref:cli --stage=${{ github.event.inputs.environment }} -- --args="migrate --force"

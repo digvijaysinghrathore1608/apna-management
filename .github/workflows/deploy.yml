@@ -57,4 +57,4 @@ jobs:
       #     npx serverless bref:cli --stage=${{ github.event.inputs.environment }} -- --args="migrate --force"
       - name: Run Migrations
         if: ${{ github.event.inputs.confirm_migration == 'YES' }}
-        run: npx serverless bref:cli --stage=${{ github.event.inputs.environment }} -- --args="migrate --force"
+        run: npx serverless bref:cli --stage=${{ github.event.inputs.environment }} --function artisan -- --args="migrate --force"

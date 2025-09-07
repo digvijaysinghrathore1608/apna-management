@@ -54,6 +54,7 @@ jobs:
       - name: Fetch SSM Parameters
         if: ${{ github.event.inputs.confirm_migration == 'YES' }}
         run: |
+          DB_CONNECTION=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment }}/DB_CONNECTION" --with-decryption --query "Parameter.Value" --output text)
           DB_HOST=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment }}/DB_HOST" --with-decryption --query "Parameter.Value" --output text)
           DB_PORT=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment }}/DB_PORT" --with-decryption --query "Parameter.Value" --output text)
           DB_DATABASE=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment }}/DB_DATABASE" --with-decryption --query "Parameter.Value" --output text)
@@ -61,6 +62,7 @@ jobs:
           DB_PASSWORD=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment }}/DB_PASSWORD" --with-decryption --query "Parameter.Value" --output text)
           APP_KEY=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment }}/APP_KEY" --with-decryption --query "Parameter.Value" --output text)
 
+          echo "DB_CONNECTION=$DB_CONNECTION" >> $GITHUB_ENV
           echo "DB_HOST=$DB_HOST" >> $GITHUB_ENV
           echo "DB_PORT=$DB_PORT" >> $GITHUB_ENV
           echo "DB_DATABASE=$DB_DATABASE" >> $GITHUB_ENV

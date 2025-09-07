@@ -56,9 +56,9 @@ provider:
 
     # Filesystem / S3
     FILESYSTEM_DRIVER: ${ssm:/apna/${sls:stage}/FILESYSTEM_DRIVER}
-    AWS_ACCESS_KEY_ID: ${ssm:/apna/${sls:stage}/AWS_ACCESS_KEY_ID}
-    AWS_SECRET_ACCESS_KEY: ${ssm:/apna/${sls:stage}/AWS_SECRET_ACCESS_KEY}
-    AWS_DEFAULT_REGION: ${ssm:/apna/${sls:stage}/AWS_DEFAULT_REGION}
+    # AWS_ACCESS_KEY_ID: ${ssm:/apna/${sls:stage}/AWS_ACCESS_KEY_ID}
+    # AWS_SECRET_ACCESS_KEY: ${ssm:/apna/${sls:stage}/AWS_SECRET_ACCESS_KEY}
+    # AWS_DEFAULT_REGION: ${ssm:/apna/${sls:stage}/AWS_DEFAULT_REGION}
     AWS_BUCKET: ${ssm:/apna/${sls:stage}/AWS_BUCKET}
     AWS_URL: ${ssm:/apna/${sls:stage}/AWS_URL}
 
@@ -73,12 +73,6 @@ functions:
       - ${bref:layer.php-82-fpm}
     events:
       - httpApi: '*'
-
-  artisan:
-    handler: artisan
-    timeout: 120
-    layers:
-      - ${bref:layer.php-82}
 
 resources:
   Resources:
@@ -96,3 +90,4 @@ resources:
         ManagedPolicyArns:
           - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
           - arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess
+          - arn:aws:iam::aws:policy/AmazonS3FullAccess

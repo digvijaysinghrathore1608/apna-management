@@ -12,6 +12,15 @@ on:
           - stage
           - prod
 
+      confirm_migration:
+        description: 'Choose YES to run migration'
+        required: true
+        default: 'NO'  
+        type: choice
+        options:
+          - "NO"  
+          - "YES"  
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -28,8 +37,8 @@ jobs:
       - name: Install Dependencies
         run: composer install --no-dev --optimize-autoloader
 
-      - name: Install Serverless
-        run: npm install -g serverless
+      - name: Install Serverless v3
+        run: npm install -g serverless@3
 
       - name: Configure AWS
         uses: aws-actions/configure-aws-credentials@v2
@@ -41,12 +50,27 @@ jobs:
       - name: Deploy Lambda
         run: serverless deploy --stage=${{ github.event.inputs.environment }}
 
-      - name: Run Migrations
+
+      - name: Fetch SSM Parameters
+        if: ${{ github.event.inputs.confirm_migration == 'YES' }}
         run: |
-          echo "WARNING: migrating DB for ${{ github.event.inputs.environment }}"
-          read -p "Type YES to continue migration: " confirm
-          if [ "$confirm" != "YES" ]; then
-            echo "Migration aborted"
-            exit 1
-          fi
-          npx serverless bref:cli --stage=${{ github.event.inputs.environment }} -- --args="migrate --force"
+          DB_CONNECTION=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment }}/DB_CONNECTION" --with-decryption --query "Parameter.Value" --output text)
+          DB_HOST=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment }}/DB_HOST" --with-decryption --query "Parameter.Value" --output text)
+          DB_PORT=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment }}/DB_PORT" --with-decryption --query "Parameter.Value" --output text)
+          DB_DATABASE=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment }}/DB_DATABASE" --with-decryption --query "Parameter.Value" --output text)
+          DB_USERNAME=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment }}/DB_USERNAME" --with-decryption --query "Parameter.Value" --output text)
+          DB_PASSWORD=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment }}/DB_PASSWORD" --with-decryption --query "Parameter.Value" --output text)
+          APP_KEY=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment }}/APP_KEY" --with-decryption --query "Parameter.Value" --output text)
+
+          echo "DB_CONNECTION=$DB_CONNECTION" >> $GITHUB_ENV
+          echo "DB_HOST=$DB_HOST" >> $GITHUB_ENV
+          echo "DB_PORT=$DB_PORT" >> $GITHUB_ENV
+          echo "DB_DATABASE=$DB_DATABASE" >> $GITHUB_ENV
+          echo "DB_USERNAME=$DB_USERNAME" >> $GITHUB_ENV
+          echo "DB_PASSWORD=$DB_PASSWORD" >> $GITHUB_ENV
+          echo "APP_KEY=$APP_KEY" >> $GITHUB_ENV
+          echo "APP_ENV=${{ github.event.inputs.environment }}" >> $GITHUB_ENV  
+
+      - name: Run Migrations
+        if: ${{ github.event.inputs.confirm_migration == 'YES' }}
+        run: php artisan migrate --force

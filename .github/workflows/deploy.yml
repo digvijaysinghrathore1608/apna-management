@@ -62,6 +62,14 @@ jobs:
           DB_PASSWORD=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment }}/DB_PASSWORD" --with-decryption --query "Parameter.Value" --output text)
           APP_KEY=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment }}/APP_KEY" --with-decryption --query "Parameter.Value" --output text)
 
+          # Mask secrets in GitHub Actions logs
+          echo "::add-mask::$DB_PASSWORD"
+          echo "::add-mask::$DB_USERNAME"
+          echo "::add-mask::$DB_DATABASE"
+          echo "::add-mask::$DB_HOST"
+          echo "::add-mask::$APP_KEY"
+
+          # Export to environment
           echo "DB_CONNECTION=$DB_CONNECTION" >> $GITHUB_ENV
           echo "DB_HOST=$DB_HOST" >> $GITHUB_ENV
           echo "DB_PORT=$DB_PORT" >> $GITHUB_ENV

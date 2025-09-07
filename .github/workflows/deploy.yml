@@ -18,8 +18,8 @@ on:
         default: 'NO'  
         type: choice
         options:
-          - NO  
-          - YES  
+          - "NO"  
+          - "YES"  
 
 jobs:
   deploy:

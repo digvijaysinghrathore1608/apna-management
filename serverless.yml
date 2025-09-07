@@ -79,7 +79,8 @@ resources:
     LambdaExecutionRole:
       Type: AWS::IAM::Role
       Properties:
-        RoleName: apna-management-lambda-role
+        # RoleName: apna-management-lambda-role
+        RoleName: ${sls:stage, 'stage'} == 'stage' ? 'apna-management-lambda-role' : 'apna-management-prod-lambda-role'
         AssumeRolePolicyDocument:
           Version: "2012-10-17"
           Statement:

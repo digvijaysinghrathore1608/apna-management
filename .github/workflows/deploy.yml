@@ -15,7 +15,11 @@ on:
       confirm_migration:
         description: 'Type YES to run migration'
         required: true
-        default: 'NO'    
+        default: 'NO'  
+        type: choice
+        options:
+          - NO  
+          - YES  
 
 jobs:
   deploy:
@@ -46,15 +50,25 @@ jobs:
       - name: Deploy Lambda
         run: serverless deploy --stage=${{ github.event.inputs.environment }}
 
-      # - name: Run Migrations
-      #   run: |
-      #     echo "WARNING: migrating DB for ${{ github.event.inputs.environment }}"
-      #     read -p "Type YES to continue migration: " confirm
-      #     if [ "$confirm" != "YES" ]; then
-      #       echo "Migration aborted"
-      #       exit 1
-      #     fi
-      #     npx serverless bref:cli --stage=${{ github.event.inputs.environment }} -- --args="migrate --force"
+
+      - name: Fetch SSM Parameters
+        if: ${{ github.event.inputs.confirm_migration == 'YES' }}
+        run: |
+          DB_HOST=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment }}/DB_HOST" --with-decryption --query "Parameter.Value" --output text)
+          DB_PORT=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment }}/DB_PORT" --with-decryption --query "Parameter.Value" --output text)
+          DB_DATABASE=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment }}/DB_DATABASE" --with-decryption --query "Parameter.Value" --output text)
+          DB_USERNAME=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment }}/DB_USERNAME" --with-decryption --query "Parameter.Value" --output text)
+          DB_PASSWORD=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment }}/DB_PASSWORD" --with-decryption --query "Parameter.Value" --output text)
+          APP_KEY=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment }}/APP_KEY" --with-decryption --query "Parameter.Value" --output text)
+
+          echo "DB_HOST=$DB_HOST" >> $GITHUB_ENV
+          echo "DB_PORT=$DB_PORT" >> $GITHUB_ENV
+          echo "DB_DATABASE=$DB_DATABASE" >> $GITHUB_ENV
+          echo "DB_USERNAME=$DB_USERNAME" >> $GITHUB_ENV
+          echo "DB_PASSWORD=$DB_PASSWORD" >> $GITHUB_ENV
+          echo "APP_KEY=$APP_KEY" >> $GITHUB_ENV
+          echo "APP_ENV=${{ github.event.inputs.environment }}" >> $GITHUB_ENV  
+
       - name: Run Migrations
         if: ${{ github.event.inputs.confirm_migration == 'YES' }}
-        run: npx serverless bref:cli --stage=${{ github.event.inputs.environment }} --function artisan -- --args="migrate --force"
+        run: php artisan migrate --force

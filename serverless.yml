@@ -74,12 +74,6 @@ functions:
     events:
       - httpApi: '*'
 
-  artisan:
-    handler: artisan
-    timeout: 120
-    layers:
-      - ${bref:layer.php-82}
-
 resources:
   Resources:
     LambdaExecutionRole:

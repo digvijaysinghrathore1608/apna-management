@@ -13,7 +13,7 @@ on:
           - prod
 
       confirm_migration:
-        description: 'Type YES to run migration'
+        description: 'Choose YES to run migration'
         required: true
         default: 'NO'  
         type: choice
@@ -52,7 +52,7 @@ jobs:
 
 
       - name: Fetch SSM Parameters
-        if: ${{ github.event.inputs.confirm_migration == 'YES' }}
+        if: ${{ github.event.inputs.confirm_migration && toLower(github.event.inputs.confirm_migration) == 'yes' }}
         run: |
           DB_HOST=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment }}/DB_HOST" --with-decryption --query "Parameter.Value" --output text)
           DB_PORT=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment }}/DB_PORT" --with-decryption --query "Parameter.Value" --output text)
@@ -70,5 +70,5 @@ jobs:
           echo "APP_ENV=${{ github.event.inputs.environment }}" >> $GITHUB_ENV  
 
       - name: Run Migrations
-        if: ${{ github.event.inputs.confirm_migration == 'YES' }}
+        if: ${{ github.event.inputs.confirm_migration && toLower(github.event.inputs.confirm_migration) == 'yes' }}
         run: php artisan migrate --force

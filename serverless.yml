@@ -74,12 +74,18 @@ functions:
     events:
       - httpApi: '*'
 
+custom:
+  roles:
+    stage: apna-management-lambda-role
+    prod: apna-management-prod-lambda-role
+
 resources:
   Resources:
     LambdaExecutionRole:
       Type: AWS::IAM::Role
       Properties:
-        RoleName: apna-management-lambda-role
+        # RoleName: apna-management-lambda-role
+        RoleName: ${self:custom.roles.${sls:stage}}
         AssumeRolePolicyDocument:
           Version: "2012-10-17"
           Statement:

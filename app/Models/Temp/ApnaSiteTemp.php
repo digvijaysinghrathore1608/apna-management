@@ -13,8 +13,11 @@ class ApnaSiteTemp extends Model
     {
         $decoded = json_decode($value, true) ?? [];
 
-        // Add employee_id to decoded array
-        $decoded['employee_id'] = $this->employee_id;
+        // Put Employee Id first, then merge with rest of array
+        $decoded = array_merge(
+            ['Employee Id' => $this->employee_id],
+            $decoded
+        );
 
         return $decoded;
     }

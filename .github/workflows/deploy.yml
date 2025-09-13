@@ -86,7 +86,7 @@ jobs:
 
       - name: Upload Assets to S3
         run: |
-          AWS_BUCKET=apna-assets-${{ github.event.inputs.environment }}
+          AWS_BUCKET=${{ secrets.AWS_S3_PREFIX }}-${{ github.event.inputs.environment }}
           # sync files
           aws s3 sync public/assets s3://$AWS_BUCKET/assets/ --delete
           aws s3 sync public/fonts s3://$AWS_BUCKET/fonts/ --delete

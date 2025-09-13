@@ -12,6 +12,7 @@ provider:
     APP_STORAGE: /tmp
     APP_KEY: ${ssm:/apna/${sls:stage}/APP_KEY}
     APP_DEBUG: ${ssm:/apna/${sls:stage}/APP_DEBUG}
+    ASSET_URL: ${ssm:/apna/${sls:stage}/ASSET_URL}
 
     # App
     APP_LOCALE: en

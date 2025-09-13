@@ -82,3 +82,16 @@ jobs:
       - name: Run Migrations
         if: ${{ github.event.inputs.confirm_migration == 'YES' }}
         run: php artisan migrate --force
+
+
+      - name: Upload Assets to S3
+        run: |
+          AWS_BUCKET=apna-assets-${{ github.event.inputs.environment }}
+          # sync files
+          aws s3 sync public/assets s3://$AWS_BUCKET/assets/ --delete
+          aws s3 sync public/fonts s3://$AWS_BUCKET/fonts/ --delete
+          aws s3 cp public/favicon.ico s3://$AWS_BUCKET/favicon.ico
+          
+          # Optional: Invalidate CloudFront cache
+          CLOUDFRONT_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?Origins.Items[0].DomainName=='$AWS_BUCKET.s3.ap-south-1.amazonaws.com'].Id | [0]" --output text)
+          aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_ID --paths "/*"  

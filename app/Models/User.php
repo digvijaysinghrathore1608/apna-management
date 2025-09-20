@@ -24,6 +24,8 @@ class User extends Authenticatable
         'status',
         'last_login_at',
         'is_banned',
+        'mobile',
+        'terms_accepted',
     ];
     // Relationships
     public function roles()
@@ -62,6 +64,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'last_login_at' => 'datetime',
             'is_banned' => 'boolean',
+            'terms_accepted' => 'boolean',
             'password' => 'hashed',
         ];
     }

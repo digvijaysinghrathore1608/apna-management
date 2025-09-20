@@ -32,6 +32,7 @@
     <!-- Vendors CSS -->
 
     <link rel="stylesheet" href="{{ assetOrDefault('assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css') }}" />
+    <link rel="stylesheet" href="{{ assetOrDefault('assets/vendor/libs/@form-validation/form-validation.css') }}" />
 
     <!-- endbuild -->
 

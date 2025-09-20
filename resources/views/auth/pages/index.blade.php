@@ -13,17 +13,18 @@
             <form id="formAuthentication" class="mb-6" action="{{ route('login.attempt') }}" method="POST">
                 @csrf
 
-                <x-form.input name="email" label="Email" type="email" placeholder="john.doe" :autofocus="true" />
+                <x-form.input name="email" label="Email" type="email" placeholder="john.doe" :autofocus="true"
+                    :required="true" />
 
-                <x-form.password name="password" label="Password" placeholder="••••••••••••" />
+                <x-form.password name="password" label="Password" placeholder="••••••••••••" :required="true" />
 
                 <div class="mb-8">
-                    <div class="d-flex justify-content-between">
-                        <x-form.checkbox name="remember" label="Remember Me" id="remember-me" />
+                    <x-form.checkbox name="remember" id="remember-me">
+                        Remember Me
                         <a href="{{ route('forgot.password') }}">
                             <span>Forgot Password?</span>
                         </a>
-                    </div>
+                    </x-form.checkbox>
                 </div>
                 <div class="mb-6">
                     <button class="btn btn-primary d-grid w-100" type="submit">Login</button>

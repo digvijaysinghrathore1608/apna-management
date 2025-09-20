@@ -32,9 +32,10 @@
     <!-- Vendors CSS -->
 
     <link rel="stylesheet" href="{{ assetOrDefault('assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css') }}" />
-
+    
     <!-- endbuild -->
-
+    
+    <link rel="stylesheet" href="{{ assetOrDefault('assets/vendor/libs/@form-validation/form-validation.css') }}" />
     <link rel="stylesheet" href="{{ assetOrDefault('assets/vendor/libs/apex-charts/apex-charts.css') }}" />
 
     <!-- Page CSS -->

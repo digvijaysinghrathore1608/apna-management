@@ -79,9 +79,13 @@
                         <div class="dropdown-divider my-1"></div>
                     </li>
                     <li>
-                        <a class="dropdown-item" href="javascript:void(0);">
-                            <i class="icon-base bx bx-power-off icon-md me-3"></i><span>Log Out</span>
-                        </a>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="dropdown-item">
+                                <i class="icon-base bx bx-power-off icon-md me-3"></i>
+                                <span>Log Out</span>
+                            </button>
+                        </form>
                     </li>
                 </ul>
             </li>

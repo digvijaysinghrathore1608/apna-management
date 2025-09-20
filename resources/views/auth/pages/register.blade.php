@@ -10,41 +10,29 @@
             <h4 class="mb-1">Adventure starts here 🚀</h4>
             <p class="mb-6">Make your app management easy and fun!</p>
 
-            <form id="formAuthentication" class="mb-6" action="{{route('dashboard')}}">
-                <div class="mb-6">
-                    <label for="username" class="form-label">Username</label>
-                    <input type="text" class="form-control" id="username" name="username"
-                        placeholder="Enter your username" autofocus />
-                </div>
-                <div class="mb-6">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="text" class="form-control" id="email" name="email"
-                        placeholder="Enter your email" />
-                </div>
-                <div class="form-password-toggle">
-                    <label class="form-label" for="password">Password</label>
-                    <div class="input-group input-group-merge">
-                        <input type="password" id="password" class="form-control" name="password"
-                            placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
-                            aria-describedby="password" />
-                        <span class="input-group-text cursor-pointer"><i class="icon-base bx bx-hide"></i></span>
-                    </div>
-                </div>
+            <form id="formAuthentication" class="mb-6" action="{{ route('register.attempt') }}" method="POST">
+                @csrf
+                <x-form.input name="name" label="name" type="text" placeholder="john doe" :required="true" />
+                <x-form.input name="email" label="email" type="email" placeholder="john.doe@example.com"
+                    :required="true" />
+                <x-form.input name="mobile" label="mobile" type="text" placeholder="123-456-7890" :required="true" />
+                <x-form.password name="password" label="password" type="password" placeholder="••••••••••••"
+                    :required="true" />
+                <x-form.password name="password_confirmation" label="password confirmation" type="password"
+                    placeholder="••••••••••••" :required="true" />
+
                 <div class="my-7">
-                    <div class="form-check mb-0">
-                        <input class="form-check-input" type="checkbox" id="terms-conditions" name="terms" />
-                        <label class="form-check-label" for="terms-conditions">
-                            I agree to
-                            <a href="javascript:void(0);">privacy policy & terms</a>
-                        </label>
-                    </div>
+                    <x-form.checkbox name="terms_accepted" id="terms-me">
+                        {{ ucwords('I agree to') }}
+                        <a href="javascript:void(0);">{{ ucwords('privacy policy & terms') }}</a>
+                    </x-form.checkbox>
                 </div>
                 <button class="btn btn-primary d-grid w-100">Sign up</button>
             </form>
 
             <p class="text-center">
                 <span>Already have an account?</span>
-                <a href="{{route('login')}}">
+                <a href="{{ route('login') }}">
                     <span>Sign in instead</span>
                 </a>
             </p>

@@ -6,6 +6,7 @@
     'id' => null,
     'value' => '',
     'autofocus' => false,
+    'required' => false,
 ])
 
 @php
@@ -15,7 +16,7 @@
 @endphp
 
 <div class="{{ $containerClass }}">
-    <label class="form-label" for="{{ $id }}">{{ $label }}</label>
+    <label class="form-label" for="{{ $id }}">{{ ucwords($label) }}</label>
     <input
         class="form-control{{ $hasError ? ' is-invalid' : '' }}"
         type="{{ $type }}"
@@ -23,6 +24,7 @@
         name="{{ $name }}"
         placeholder="{{ $placeholder }}"
         value="{{ old($name, $value) }}"
+        {{ $required ? 'required' : '' }}
         @if($autofocus) autofocus @endif
     >
     <div class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback">

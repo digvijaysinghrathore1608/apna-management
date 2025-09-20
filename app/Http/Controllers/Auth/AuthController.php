@@ -4,12 +4,20 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\RegisterRequest;
+use App\Services\AuthService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 
 class AuthController extends Controller
 {
+    protected $authService;
+
+    public function __construct(AuthService $authService)
+    {
+        $this->authService = $authService;
+    }
     public function showLoginForm()
     {
         return view('auth.pages.index');
@@ -18,8 +26,7 @@ class AuthController extends Controller
     public function login(LoginRequest $request)
     {
         $credentials = $request->only('email', 'password');
-        if (Auth::attempt($credentials, $request->filled('remember'))) {
-            $request->session()->regenerate();
+        if ($this->authService->login($credentials, $request->filled('remember'))) {
             return redirect()->intended(route('dashboard'));
         }
         return back()->withErrors(['email' => 'Invalid credentials'])->withInput();
@@ -30,18 +37,15 @@ class AuthController extends Controller
         return view('auth.pages.register');
     }
 
-    public function register(Request $request)
+    public function register(RegisterRequest $request)
     {
-        // Registration logic will be handled in service/repository
-        // Placeholder for now
+        $this->authService->register($request->only('name', 'email', 'password', 'mobile', 'terms_accepted'));
         return redirect()->route('login');
     }
 
     public function logout(Request $request)
     {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        $this->authService->logout();
         return redirect()->route('login');
     }
 

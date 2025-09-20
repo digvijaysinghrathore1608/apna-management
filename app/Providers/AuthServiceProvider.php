@@ -28,7 +28,6 @@ class AuthServiceProvider extends ServiceProvider
             if ($user->hasRole('super_admin')) {
                 return true;
             }
-            // ...other logic for other roles/services...
             return false;
         });
     }

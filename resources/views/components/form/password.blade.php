@@ -3,26 +3,24 @@
     'label' => 'Password',
     'placeholder' => '············',
     'id' => null,
+    'required' => false,
 ])
 
 @php
     $id = $id ?? $name;
     $hasError = $errors->has($name);
-    $containerClass = 'mb-6 form-control-validation fv-plugins-icon-container' . ($hasError ? ' fv-plugins-bootstrap5-row-invalid' : '');
+    $containerClass =
+        'mb-6 form-control-validation fv-plugins-icon-container' .
+        ($hasError ? ' fv-plugins-bootstrap5-row-invalid' : '');
 @endphp
 
 <div class="{{ $containerClass }}">
     <div class="form-password-toggle">
-        <label class="form-label" for="{{ $id }}">{{ $label }}</label>
+        <label class="form-label" for="{{ $id }}">{{ ucwords($label) }}</label>
         <div class="input-group input-group-merge has-validation">
-            <input
-                class="form-control{{ $hasError ? ' is-invalid' : '' }}"
-                type="password"
-                id="{{ $id }}"
-                name="{{ $name }}"
-                placeholder="{{ $placeholder }}"
-                aria-describedby="multicol-password2"
-            >
+            <input class="form-control{{ $hasError ? ' is-invalid' : '' }}" type="password" id="{{ $id }}"
+                name="{{ $name }}" placeholder="{{ $placeholder }}" aria-describedby="multicol-password2"
+                value="{{ old($name) }}" {{ $required ? 'required' : '' }}>
             <span class="input-group-text cursor-pointer" id="multicol-password2">
                 <i class="icon-base bx bx-hide"></i>
             </span>

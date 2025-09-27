@@ -60,10 +60,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Deploy Lambda
-        run: serverless deploy --stage=${{ github.event.inputs.environment || 'stage' }}
-
-
       - name: Fetch SSM Parameters
         if: ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.confirm_migration == 'YES') || (github.event_name == 'push' && github.ref == 'refs/heads/stage') }}
         run: |
@@ -103,7 +99,10 @@ jobs:
           php artisan config:cache
           php artisan route:cache
           php artisan view:cache
-          
+
+      - name: Deploy Lambda
+        run: serverless deploy --stage=${{ github.event.inputs.environment || 'stage' }}
+        
       - name: Run Migrations
         if: ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.confirm_migration == 'YES') || (github.event_name == 'push' && github.ref == 'refs/heads/stage') }}
         run: php artisan migrate --force

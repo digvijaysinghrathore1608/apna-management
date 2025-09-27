@@ -8,7 +8,7 @@
     </div>
 
     <div class="card p-3 mb-2">
-        <form action="{{ route('microfinance.customers.edit', ['id' => $customer->id]) }}" method="POST">
+        <form action="{{ route('microfinance.customers.update', ['id' => $customer->id]) }}" method="POST">
             @csrf
             <div class="row">
                 @foreach ($fields as $field)

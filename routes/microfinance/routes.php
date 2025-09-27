@@ -16,7 +16,7 @@ Route::middleware(['auth', 'can:microfinance'])->prefix('microfinance')->name('m
                 Route::get('create', 'create')->name('create');
                 Route::post('store', 'store')->name('store');
                 Route::get('edit/{id}', 'edit')->name('edit');
-                Route::post('edit/{id}', 'update')->name('edit');
+                Route::post('edit/{id}', 'update')->name('update');
             });
         });
 });

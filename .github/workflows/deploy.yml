@@ -48,7 +48,7 @@ jobs:
           php-version: '8.2'
 
       - name: Install Dependencies
-        run: composer install --no-dev --optimize-autoloader
+        run: composer install --no-dev --optimize-autoloader --no-scripts
 
       - name: Install Serverless v3
         run: npm install -g serverless@3

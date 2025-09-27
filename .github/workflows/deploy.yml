@@ -28,12 +28,16 @@ on:
         type: choice
         options:
           - "NO"  
-          - "YES"  
+          - "YES" 
+
+  push:
+    branches:
+      - stage         
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.environment }}
+    environment: ${{ github.event.inputs.environment || 'stage' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -57,19 +61,19 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Deploy Lambda
-        run: serverless deploy --stage=${{ github.event.inputs.environment }}
+        run: serverless deploy --stage=${{ github.event.inputs.environment || 'stage' }}
 
 
       - name: Fetch SSM Parameters
-        if: ${{ github.event.inputs.confirm_migration == 'YES' }}
+        if: ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.confirm_migration == 'YES') || (github.event_name == 'push' && github.ref == 'refs/heads/stage') }}
         run: |
-          DB_CONNECTION=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment }}/DB_CONNECTION" --with-decryption --query "Parameter.Value" --output text)
-          DB_HOST=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment }}/DB_HOST" --with-decryption --query "Parameter.Value" --output text)
-          DB_PORT=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment }}/DB_PORT" --with-decryption --query "Parameter.Value" --output text)
-          DB_DATABASE=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment }}/DB_DATABASE" --with-decryption --query "Parameter.Value" --output text)
-          DB_USERNAME=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment }}/DB_USERNAME" --with-decryption --query "Parameter.Value" --output text)
-          DB_PASSWORD=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment }}/DB_PASSWORD" --with-decryption --query "Parameter.Value" --output text)
-          APP_KEY=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment }}/APP_KEY" --with-decryption --query "Parameter.Value" --output text)
+          DB_CONNECTION=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment || 'stage' }}/DB_CONNECTION" --with-decryption --query "Parameter.Value" --output text)
+          DB_HOST=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment || 'stage' }}/DB_HOST" --with-decryption --query "Parameter.Value" --output text)
+          DB_PORT=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment || 'stage' }}/DB_PORT" --with-decryption --query "Parameter.Value" --output text)
+          DB_DATABASE=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment || 'stage' }}/DB_DATABASE" --with-decryption --query "Parameter.Value" --output text)
+          DB_USERNAME=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment || 'stage' }}/DB_USERNAME" --with-decryption --query "Parameter.Value" --output text)
+          DB_PASSWORD=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment || 'stage' }}/DB_PASSWORD" --with-decryption --query "Parameter.Value" --output text)
+          APP_KEY=$(aws ssm get-parameter --name "/apna/${{ github.event.inputs.environment || 'stage' }}/APP_KEY" --with-decryption --query "Parameter.Value" --output text)
 
           # Mask secrets in GitHub Actions logs
           echo "::add-mask::$DB_PASSWORD"
@@ -86,17 +90,21 @@ jobs:
           echo "DB_USERNAME=$DB_USERNAME" >> $GITHUB_ENV
           echo "DB_PASSWORD=$DB_PASSWORD" >> $GITHUB_ENV
           echo "APP_KEY=$APP_KEY" >> $GITHUB_ENV
-          echo "APP_ENV=${{ github.event.inputs.environment }}" >> $GITHUB_ENV  
+          echo "APP_ENV=${{ github.event.inputs.environment || 'stage' }}" >> $GITHUB_ENV  
 
       - name: Run Migrations
-        if: ${{ github.event.inputs.confirm_migration == 'YES' }}
+        if: ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.confirm_migration == 'YES') || (github.event_name == 'push' && github.ref == 'refs/heads/stage') }}
         run: php artisan migrate --force
+
+      - name: Run Seed
+        if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/stage') }}  
+        run: php artisan db:seed --class=SuperAdminSeeder
 
 
       - name: Upload Assets to S3
-        if: ${{ github.event.inputs.confirm_assets_update == 'YES' }}
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.confirm_assets_update == 'YES' }}
         run: |
-          AWS_BUCKET=${{ secrets.AWS_S3_PREFIX }}-${{ github.event.inputs.environment }}
+          AWS_BUCKET=${{ secrets.AWS_S3_PREFIX }}-${{ github.event.inputs.environment || 'stage' }}
           # sync files
           aws s3 sync public/assets s3://$AWS_BUCKET/assets/ --delete
           aws s3 sync public/fonts s3://$AWS_BUCKET/fonts/ --delete

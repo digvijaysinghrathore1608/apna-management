@@ -32,12 +32,20 @@
     <!-- Vendors CSS -->
 
     <link rel="stylesheet" href="{{ assetOrDefault('assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css') }}" />
-    
+
     <!-- endbuild -->
-    
+
     <link rel="stylesheet" href="{{ assetOrDefault('assets/vendor/libs/@form-validation/form-validation.css') }}" />
     <link rel="stylesheet" href="{{ assetOrDefault('assets/vendor/libs/apex-charts/apex-charts.css') }}" />
+    <!-- Boxicons CSS -->
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
+
+    {{-- ToastMagic CSS --}}
+    {!! ToastMagic::styles() !!}
+
+    @stack('styles')
     <!-- Page CSS -->
 
     <!-- Helpers -->
@@ -65,8 +73,23 @@
 
                 <!-- / Navbar -->
 
-                @yield('content')
+                <!-- Content wrapper -->
+                <div class="content-wrapper">
+                    <!-- Content -->
+                    <div class="container-xxl flex-grow-1 container-p-y">
 
+                        @yield('content')
+
+                    </div>
+                    <!-- / Content -->
+
+                    <!-- Footer -->
+                    @include('partials.layouts.footer')
+                    <!-- / Footer -->
+
+                    <div class="content-backdrop fade"></div>
+                </div>
+                <!-- Content wrapper -->
             </div>
             <!-- / Layout page -->
         </div>
@@ -98,6 +121,11 @@
 
     <!-- Page JS -->
     <script src="{{ assetOrDefault('assets/js/dashboards-analytics.js') }}"></script>
+
+    {{-- ToastMagic JS --}}
+    {!! ToastMagic::scripts() !!}
+
+    @stack('scripts')
 
     <!-- Place this tag before closing body tag for github widget button. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>

@@ -1,5 +1,5 @@
 <div class="app-brand justify-content-center">
-    <a href="{{ route('dashboard') }}" class="app-brand-link gap-2">
+    <a href="{{ route('welcome') }}" class="app-brand-link gap-2">
         <span class="app-brand-logo demo">
             <span class="text-primary">
                 <svg width="25" viewBox="0 0 25 42" version="1.1" xmlns="http://www.w3.org/2000/svg"

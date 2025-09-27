@@ -13,18 +13,29 @@ class SuperAdminSeeder extends Seeder
 {
     public function run(): void
     {
-        // Create Super Admin Role
-        $role = Role::firstOrCreate(['name' => 'super_admin']);
+        // Create roles
+        $roles = [
+            'super_admin',
+            'default',
+        ];
+        $roleIds = [];
+        foreach ($roles as $roleName) {
+            $role = Role::firstOrCreate(['name' => $roleName]);
+            $roleIds[$roleName] = $role->id;
+        }
 
-        // Create all services (add your actual service names here)
-        $services = ['default'];
+        // Create services
+        $services = [
+            'welcome',
+            'microfinance',
+        ];
         $serviceIds = [];
         foreach ($services as $serviceName) {
             $service = Service::firstOrCreate(['name' => $serviceName]);
-            $serviceIds[] = $service->id;
+            $serviceIds[$serviceName] = $service->id;
         }
 
-        // Create Super Admin User
+        // Create super admin user
         $user = User::firstOrCreate(
             ['email' => 'superadmin@example.com'],
             [
@@ -35,12 +46,12 @@ class SuperAdminSeeder extends Seeder
             ]
         );
 
-        // Assign Super Admin role to all services
+        // Assign super_admin role to ALL services
         foreach ($serviceIds as $serviceId) {
             UserServiceRole::firstOrCreate([
-                'user_id' => $user->id,
+                'user_id'    => $user->id,
                 'service_id' => $serviceId,
-                'role_id' => $role->id,
+                'role_id'    => $roleIds['super_admin'],
             ]);
         }
     }

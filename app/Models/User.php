@@ -28,6 +28,12 @@ class User extends Authenticatable
         'terms_accepted',
     ];
     // Relationships
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->roles()->where('name', 'super_admin')->exists();
+    }
+
     public function roles()
     {
         return $this->belongsToMany(Role::class, 'user_service_roles')->withTimestamps();
@@ -76,11 +82,11 @@ class User extends Authenticatable
 
     public function hasRole($role, $service = null): bool
     {
-        $query = $this->userServiceRoles()->whereHas('role', function($q) use ($role) {
+        $query = $this->userServiceRoles()->whereHas('role', function ($q) use ($role) {
             $q->where('name', $role);
         });
         if ($service) {
-            $query->whereHas('service', function($q) use ($service) {
+            $query->whereHas('service', function ($q) use ($service) {
                 $q->where('name', $service);
             });
         }
@@ -90,5 +96,13 @@ class User extends Authenticatable
     public function hasService($service): bool
     {
         return $this->services()->where('name', $service)->exists();
+    }
+
+    public function hasServiceRole(string $service, string $role): bool
+    {
+        return $this->userServiceRoles()
+            ->whereHas('service', fn($q) => $q->where('name', $service))
+            ->whereHas('role', fn($q) => $q->where('name', $role))
+            ->exists();
     }
 }

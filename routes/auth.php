@@ -10,5 +10,7 @@ Route::controller(AuthController::class)->group(function () {
     Route::get('register', 'showRegisterForm')->name('register');
     Route::post('register', 'register')->name('register.attempt');
     Route::post('logout', 'logout')->name('logout');
+
+    //not working
     Route::get('forgot-password', 'showForgotPasswordForm')->name('forgot.password');
 });

@@ -92,6 +92,18 @@ jobs:
           echo "APP_KEY=$APP_KEY" >> $GITHUB_ENV
           echo "APP_ENV=${{ github.event.inputs.environment || 'stage' }}" >> $GITHUB_ENV  
 
+      - name: Laravel Optimize (pre-build caches)
+        run: |
+          php artisan config:clear
+          php artisan cache:clear
+          php artisan route:clear
+          php artisan view:clear
+
+          php artisan package:discover --ansi
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
+          
       - name: Run Migrations
         if: ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.confirm_migration == 'YES') || (github.event_name == 'push' && github.ref == 'refs/heads/stage') }}
         run: php artisan migrate --force

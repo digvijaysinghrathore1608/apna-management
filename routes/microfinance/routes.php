@@ -1,22 +1,24 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Finance\BranchController;
 use App\Http\Controllers\Finance\CustomerController;
+use App\Http\Controllers\Finance\GroupController;
+use App\Http\Controllers\Finance\LoanApplicationController;
+use App\Http\Controllers\Finance\SchemaController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'can:microfinance'])->prefix('microfinance')->name('microfinance.')->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::middleware(['auth', 'can:microfinance'])
+    ->prefix('microfinance')
+    ->name('microfinance.')
+    ->group(function () {
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    Route::middleware(['canAny:microfinance.default'])
-        ->prefix('customers')
-        ->as('customers.')
-        ->group(function () {
-            Route::controller(CustomerController::class)->group(function () {
-                Route::get('', 'index')->name('index');
-                Route::get('create', 'create')->name('create');
-                Route::post('store', 'store')->name('store');
-                Route::get('edit/{id}', 'edit')->name('edit');
-                Route::post('edit/{id}', 'update')->name('update');
-            });
+        Route::middleware(['canAny:microfinance.admin'])->group(function () {
+            Route::resource('customers', CustomerController::class)->except(['show']);
+            Route::resource('loanapplication', LoanApplicationController::class)->except(['show']);
+            Route::resource('branch', BranchController::class)->except(['show']);
+            Route::resource('groups', GroupController::class)->except(['show']);
+            Route::resource('schema', SchemaController::class)->except(['show']);
         });
-});
+    });

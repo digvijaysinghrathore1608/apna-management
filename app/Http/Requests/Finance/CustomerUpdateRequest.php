@@ -22,12 +22,12 @@ class CustomerUpdateRequest extends FormRequest
             'mobile' => [
                 'required',
                 'regex:/^[6-9]\d{9}$/',
-                Rule::unique('finance_customers', 'mobile')->ignore($this->route('id'))
+                Rule::unique('finance_customers', 'mobile')->ignore($this->route('customer'))
             ],
             'email' => [
                 'nullable',
                 'email',
-                Rule::unique('finance_customers', 'email')->ignore($this->route('id'))
+                Rule::unique('finance_customers', 'email')->ignore($this->route('customer'))
             ],
             'DOB' => [
                 'required',

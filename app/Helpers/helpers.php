@@ -54,6 +54,22 @@ if (!function_exists('genders')) {
     }
 }
 
+if (!function_exists('duration_type')) {
+
+    function duration_type(): array
+    {
+        return DURATION_TYPE;
+    }
+}
+
+if (!function_exists('days')) {
+
+    function days(): array
+    {
+        return range(1, 31);;
+    }
+}
+
 if (!function_exists('extractNumberPart')) {
     /**
      * Extract digits from start, end or both sides of a number.
@@ -92,7 +108,8 @@ if (!function_exists('extractNumberPart')) {
 
 
 if (! function_exists('canAny')) {
-    function canAny(array $abilities): bool {
+    function canAny(array $abilities): bool
+    {
         foreach ($abilities as $ability) {
             if (Gate::allows($ability)) {
                 return true;

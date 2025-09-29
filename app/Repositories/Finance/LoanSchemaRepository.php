@@ -2,18 +2,17 @@
 
 namespace App\Repositories\Finance;
 
-use App\Models\Finance\Branch;
-use App\Models\Finance\Customer;
-use App\Repositories\Interface\Finance\BranchRepositoryInterface;
+use App\Models\Finance\LoanSchema;
+use App\Repositories\Interface\Finance\LoanSchemaRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Yajra\DataTables\DataTables;
 
-class BranchRepository implements BranchRepositoryInterface
+class LoanSchemaRepository implements LoanSchemaRepositoryInterface
 {
     public function __construct(
-        private readonly Branch   $model,
+        private readonly LoanSchema   $model,
     ) {}
     public function getDataTable(Request $request)
     {
@@ -23,13 +22,13 @@ class BranchRepository implements BranchRepositoryInterface
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->editColumn('actions', function ($row) {
-                    $editUrl   = route('microfinance.branch.edit', $row->id);
-                    $deleteUrl = route('microfinance.branch.destroy', $row->id);
+                    $editUrl   = route('microfinance.schema.edit', $row->id);
+                    $deleteUrl = route('microfinance.schema.destroy', $row->id);
                     return '
                                 <a href="' . $editUrl . '" class="btn btn-sm btn-primary me-1" title="Edit">
                                     <i class="fa fa-edit"></i>
                                 </a>
-                                <form action="' . $deleteUrl . '" method="POST" style="display:inline-block;" onsubmit="return confirm(\'Are you sure you want to delete this branch?\')">
+                                <form action="' . $deleteUrl . '" method="POST" style="display:inline-block;" onsubmit="return confirm(\'Are you sure you want to delete this group?\')">
                                     ' . csrf_field() . '
                                     ' . method_field('DELETE') . '
                                     <button type="submit" class="btn btn-sm btn-danger" title="Delete">

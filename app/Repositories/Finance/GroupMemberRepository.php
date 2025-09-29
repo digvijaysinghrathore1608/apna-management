@@ -2,18 +2,19 @@
 
 namespace App\Repositories\Finance;
 
-use App\Models\Finance\Branch;
+use App\Models\Finance\Application;
 use App\Models\Finance\Customer;
-use App\Repositories\Interface\Finance\BranchRepositoryInterface;
+use App\Models\Finance\GroupMember;
+use App\Repositories\Interface\Finance\GroupMemberRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Yajra\DataTables\DataTables;
 
-class BranchRepository implements BranchRepositoryInterface
+class GroupMemberRepository implements GroupMemberRepositoryInterface
 {
     public function __construct(
-        private readonly Branch   $model,
+        private readonly GroupMember   $model,
     ) {}
     public function getDataTable(Request $request)
     {
@@ -22,14 +23,17 @@ class BranchRepository implements BranchRepositoryInterface
 
             return DataTables::of($data)
                 ->addIndexColumn()
+                ->addColumn('name', function ($row) {
+                    return $row->name; // accessor from model
+                })
                 ->editColumn('actions', function ($row) {
-                    $editUrl   = route('microfinance.branch.edit', $row->id);
-                    $deleteUrl = route('microfinance.branch.destroy', $row->id);
+                    $editUrl   = route('microfinance.groups.edit', $row->id);
+                    $deleteUrl = route('microfinance.groups.destroy', $row->id);
                     return '
                                 <a href="' . $editUrl . '" class="btn btn-sm btn-primary me-1" title="Edit">
                                     <i class="fa fa-edit"></i>
                                 </a>
-                                <form action="' . $deleteUrl . '" method="POST" style="display:inline-block;" onsubmit="return confirm(\'Are you sure you want to delete this branch?\')">
+                                <form action="' . $deleteUrl . '" method="POST" style="display:inline-block;" onsubmit="return confirm(\'Are you sure you want to delete this group?\')">
                                     ' . csrf_field() . '
                                     ' . method_field('DELETE') . '
                                     <button type="submit" class="btn btn-sm btn-danger" title="Delete">

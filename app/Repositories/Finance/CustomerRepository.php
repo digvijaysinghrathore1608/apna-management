@@ -27,7 +27,7 @@ class CustomerRepository implements CustomerRepositoryInterface
                         : '<span class="badge bg-danger">Inactive</span>';
                 })
                 ->editColumn('actions', function ($row) {
-                    $editUrl   = route('microfinance.customers.edit', ['id' => $row->id]);
+                    $editUrl   = route('microfinance.customers.edit',  $row->id);
                     return '
                                 <a href="' . $editUrl . '" class="btn btn-sm btn-primary me-1" title="Edit">
                                     <i class="fa fa-edit"></i>

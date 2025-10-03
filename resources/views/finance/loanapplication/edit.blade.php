@@ -3,18 +3,20 @@
 @section('content')
     <div class="card p-3 mb-2">
         <div class="d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">{{ translate('create_schema') }}</h5>
+            <h5 class="mb-0">{{ translate('update_loan') }}</h5>
         </div>
     </div>
 
     <div class="card p-3 mb-2">
-        <form action="{{ route('microfinance.schema.store') }}" method="POST">
+        <form action="{{ route('microfinance.loanapplication.edit.' . $next_step, $id) }}" method="POST">
             @csrf
+            @method('PATCH')
             <x-form.inputs-loop :fields="$fields" />
+
             {{-- Submit Button --}}
             <div class="mt-3">
                 <button type="submit" class="btn btn-primary">Save</button>
-                <a href="{{ route('microfinance.schema.index') }}" class="btn btn-secondary">Cancel</a>
+                <a href="{{ route('microfinance.loanapplication.index') }}" class="btn btn-secondary">Cancel</a>
             </div>
         </form>
     </div>

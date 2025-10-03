@@ -35,6 +35,7 @@
         },
         "files": [
             "app/Helpers/helpers.php",
+            "app/Helpers/finance.php",
             "app/Utils/constant.php"
         ]
     },

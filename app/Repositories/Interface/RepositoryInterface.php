@@ -28,7 +28,7 @@ interface RepositoryInterface
      * @param int|null $offset
      * @return Collection|LengthAwarePaginator
      */
-    public function getList(array $orderBy=[], array $relations = [], int|string $dataLimit = DEFAULT_DATA_LIMIT, int $offset = null): Collection|LengthAwarePaginator;
+    public function getList(array $orderBy = [], array $relations = [], int|string $dataLimit = DEFAULT_DATA_LIMIT, int $offset = null): Collection|LengthAwarePaginator;
 
 
     /**
@@ -40,7 +40,7 @@ interface RepositoryInterface
      * @param int|null $offset
      * @return Collection|LengthAwarePaginator
      */
-    public function getListWhere(array $orderBy=[], string $searchValue = null, array $filters = [], array $relations = [], int|string $dataLimit = DEFAULT_DATA_LIMIT, int $offset = null): Collection|LengthAwarePaginator;
+    public function getListWhere(array $orderBy = [], string $searchValue = null, array $filters = [], array $relations = [], int|string $dataLimit = DEFAULT_DATA_LIMIT, int $offset = null): Collection|LengthAwarePaginator;
 
 
     /**
@@ -55,4 +55,6 @@ interface RepositoryInterface
      * @return bool
      */
     public function delete(array $params): bool;
+
+    public function duplicate(array $params): ?Model;
 }

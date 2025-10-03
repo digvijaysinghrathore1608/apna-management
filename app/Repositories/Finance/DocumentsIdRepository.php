@@ -7,6 +7,7 @@ use App\Models\Finance\Customer;
 use App\Models\Finance\DocumentIdentities;
 use App\Repositories\Interface\Finance\DocumentsIdRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Yajra\DataTables\DataTables;
@@ -83,5 +84,10 @@ class DocumentsIdRepository implements DocumentsIdRepositoryInterface
     public function update(string $id, array $data): bool
     {
         return $this->model->where('id', $id)->update($data);
+    }
+
+    public function duplicate(array $params): ?Model
+    {
+        return $this->model->replicate();
     }
 }

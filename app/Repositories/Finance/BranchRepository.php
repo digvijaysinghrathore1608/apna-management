@@ -6,6 +6,7 @@ use App\Models\Finance\Branch;
 use App\Models\Finance\Customer;
 use App\Repositories\Interface\Finance\BranchRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Yajra\DataTables\DataTables;
@@ -99,5 +100,10 @@ class BranchRepository implements BranchRepositoryInterface
     public function update(string $id, array $data): bool
     {
         return $this->model->where('id', $id)->update($data);
+    }
+
+    public function duplicate(array $params): ?Model
+    {
+        return $this->model->replicate();
     }
 }

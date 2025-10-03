@@ -16,9 +16,26 @@ Route::middleware(['auth', 'can:microfinance'])
 
         Route::middleware(['canAny:microfinance.admin'])->group(function () {
             Route::resource('customers', CustomerController::class)->except(['show']);
-            Route::resource('loanapplication', LoanApplicationController::class)->except(['show']);
+            Route::group(['prefix' => 'customers', 'as' => 'customers.', 'controller' => CustomerController::class], function () {
+                Route::post('generate-loan/{id}', 'generate_loan')->name('generate_loan');
+            });
+
+
             Route::resource('branch', BranchController::class)->except(['show']);
             Route::resource('groups', GroupController::class)->except(['show']);
             Route::resource('schema', SchemaController::class)->except(['show']);
+
+
+            Route::resource('loanapplication', LoanApplicationController::class)->except(['show']);
+            Route::prefix('loanapplication/edit')->as('loanapplication.edit.')->controller(LoanApplicationController::class)->group(function () {
+                Route::get('{id}/step1', 'edit')->name('step1');
+                Route::get('{id}/step2', 'edit_step2')->name('step2');
+                Route::get('{id}/step3', 'edit_step3')->name('step3');
+
+                Route::patch('{id}/step1', 'update')->name('step1');
+                Route::patch('{id}/step2', 'update_step_2')->name('step2');
+                Route::patch('{id}/step3', 'update_step_3')->name('step3');
+
+            });
         });
     });

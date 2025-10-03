@@ -6,6 +6,7 @@ use App\Models\Finance\Application;
 use App\Models\Finance\Customer;
 use App\Repositories\Interface\Finance\LoanApplicationRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Yajra\DataTables\DataTables;
@@ -22,6 +23,23 @@ class LoanApplicationRepository implements LoanApplicationRepositoryInterface
 
             return DataTables::of($data)
                 ->addIndexColumn()
+                ->editColumn('actions', function ($row) {
+                    $editUrl   = route('microfinance.loanapplication.edit', $row->id);
+                    $deleteUrl = route('microfinance.loanapplication.destroy', $row->id);
+                    return '
+                                <a href="' . $editUrl . '" class="btn btn-sm btn-primary me-1" title="Edit">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                                <form action="' . $deleteUrl . '" method="POST" style="display:inline-block;" onsubmit="return confirm(\'Are you sure you want to delete this group?\')">
+                                    ' . csrf_field() . '
+                                    ' . method_field('DELETE') . '
+                                    <button type="submit" class="btn btn-sm btn-danger" title="Delete">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </form>
+                            ';
+                })
+                ->rawColumns(columns: ['actions'])
                 ->make(true);
         }
 
@@ -82,5 +100,10 @@ class LoanApplicationRepository implements LoanApplicationRepositoryInterface
     public function update(string $id, array $data): bool
     {
         return $this->model->where('id', $id)->update($data);
+    }
+
+    public function duplicate(array $params): ?Model
+    {
+        return $this->model->replicate();
     }
 }

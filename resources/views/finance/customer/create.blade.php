@@ -10,15 +10,7 @@
     <div class="card p-3 mb-2">
         <form action="{{ route('microfinance.customers.store') }}" method="POST">
             @csrf
-            <div class="row">
-                @foreach ($fields as $field)
-                    <div class="col-md-{{ $field['col'] ?? 6 }}">
-                        <x-form.input :name="$field['name']" :label="$field['label']" :type="$field['type'] ?? 'text'" :placeholder="$field['placeholder'] ?? ''"
-                            :required="$field['required'] ?? false ? 'true' : ''" :options="$field['options'] ?? []" />
-                    </div>
-                @endforeach
-            </div>
-
+            <x-form.inputs-loop :fields="$fields" />
             {{-- Submit Button --}}
             <div class="mt-3">
                 <button type="submit" class="btn btn-primary">Save</button>

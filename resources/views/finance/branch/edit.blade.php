@@ -11,14 +11,8 @@
         <form action="{{ route('microfinance.branch.update', $branch->id) }}" method="POST">
             @csrf
             @method('PATCH')
-            <div class="row">
-                @foreach ($fields as $field)
-                    <div class="col-md-{{ $field['col'] ?? 6 }}">
-                        <x-form.input :name="$field['name']" :label="$field['label']" :type="$field['type'] ?? 'text'" :placeholder="$field['placeholder'] ?? ''"
-                            :disabled="$field['disabled'] ?? false ? 'true' : ''" :required="$field['required'] ?? false ? 'true' : ''" :options="$field['options'] ?? []" :value="$field['value']" />
-                    </div>
-                @endforeach
-            </div>
+            
+            <x-form.inputs-loop :fields="$fields" />
 
             {{-- Submit Button --}}
             <div class="mt-3">

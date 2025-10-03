@@ -8,6 +8,7 @@ use App\Http\Requests\Finance\CustomerUpdateRequest;
 use App\Repositories\Interface\Finance\BranchRepositoryInterface;
 use App\Repositories\Interface\Finance\CustomerRepositoryInterface;
 use App\Repositories\Interface\Finance\DocumentsIdRepositoryInterface;
+use App\Repositories\Interface\Finance\LoanApplicationRepositoryInterface;
 use Devrabiul\ToastMagic\Facades\ToastMagic;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,6 +20,7 @@ class CustomerController extends BaseController
         private readonly CustomerRepositoryInterface $customerRepo,
         private readonly BranchRepositoryInterface $branchRepo,
         private readonly DocumentsIdRepositoryInterface $documentsIdRepo,
+        private readonly LoanApplicationRepositoryInterface $loanApplicationRepo,
     ) {}
 
     protected function saveDocument(string $name, string $number, int $relationId): void
@@ -176,8 +178,37 @@ class CustomerController extends BaseController
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $id) {}
+
+    public function generate_loan(string $id)
     {
-        
+        return $this->handleRequest(function () use ($id) {
+            $customer = $this->customerRepo->getFirstWhere(params: ['id' => $id]);
+
+            if (!$customer) {
+                ToastMagic::error(translate('customer_not_found'));
+                return back();
+            }
+
+            if ($customer->current_loan) {
+                $loanapplication = $this->loanApplicationRepo->getFirstWhere(params: ['id' => $customer->current_loan]);
+                if (!$loanapplication) {
+                    ToastMagic::error(translate('customer_loan_not_found'));
+                    return back();
+                }
+                if ($loanapplication->status != LOAN_STATUS_CLOSED) {
+                    ToastMagic::error(translate('customer_loan_alredy_running'));
+                    return back();
+                }
+                $newLoanId = "TEMP" . now()->timestamp;
+                $this->loanApplicationRepo->add(['loan_id' => $newLoanId, 'customer_id' => $customer->id, 'branch_id' => $customer->branch_id]);
+            } else {
+                $newLoanId = "TEMP" . now()->timestamp;
+                $this->loanApplicationRepo->add(['loan_id' => $newLoanId, 'customer_id' => $customer->id, 'branch_id' => $customer->branch_id]);
+            }
+
+            ToastMagic::success(translate('successfully_generated_new_loan'));
+            return redirect()->back();
+        });
     }
 }

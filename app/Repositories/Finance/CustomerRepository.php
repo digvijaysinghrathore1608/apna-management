@@ -5,6 +5,7 @@ namespace App\Repositories\Finance;
 use App\Models\Finance\Customer;
 use App\Repositories\Interface\Finance\CustomerRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Yajra\DataTables\DataTables;
@@ -28,10 +29,17 @@ class CustomerRepository implements CustomerRepositoryInterface
                 })
                 ->editColumn('actions', function ($row) {
                     $editUrl   = route('microfinance.customers.edit',  $row->id);
+                    $generateLoanUrl = route('microfinance.customers.generate_loan', $row->id);
                     return '
                                 <a href="' . $editUrl . '" class="btn btn-sm btn-primary me-1" title="Edit">
                                     <i class="fa fa-edit"></i>
                                 </a>
+                                <form action="' . $generateLoanUrl . '" method="POST" style="display:inline-block;" onsubmit="return confirm(\'Are you sure you want to generate a new loan for this customer?\')">
+                                    ' . csrf_field() . '
+                                    <button type="submit" class="btn btn-sm btn-success" title="' . translate('lona_genrate') . '">
+                                        <i class="fa-solid fa-hand-holding-dollar"></i>
+                                    </button>
+                                </form>
                             ';
                 })
                 ->rawColumns(['status', 'actions'])
@@ -101,5 +109,10 @@ class CustomerRepository implements CustomerRepositoryInterface
     public function update(string $id, array $data): bool
     {
         return $this->model->where('id', $id)->update($data);
+    }
+
+    public function duplicate(array $params): ?Model
+    {
+        return $this->model->replicate();
     }
 }

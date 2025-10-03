@@ -5,6 +5,7 @@ namespace App\Repositories\Finance;
 use App\Models\Finance\LoanSchema;
 use App\Repositories\Interface\Finance\LoanSchemaRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Yajra\DataTables\DataTables;
@@ -28,7 +29,7 @@ class LoanSchemaRepository implements LoanSchemaRepositoryInterface
                                 <a href="' . $editUrl . '" class="btn btn-sm btn-primary me-1" title="Edit">
                                     <i class="fa fa-edit"></i>
                                 </a>
-                                <form action="' . $deleteUrl . '" method="POST" style="display:inline-block;" onsubmit="return confirm(\'Are you sure you want to delete this group?\')">
+                                <form action="' . $deleteUrl . '" method="POST" style="display:inline-block;" onsubmit="return confirm(\'Are you sure you want to delete this schema?\')">
                                     ' . csrf_field() . '
                                     ' . method_field('DELETE') . '
                                     <button type="submit" class="btn btn-sm btn-danger" title="Delete">
@@ -98,5 +99,10 @@ class LoanSchemaRepository implements LoanSchemaRepositoryInterface
     public function update(string $id, array $data): bool
     {
         return $this->model->where('id', $id)->update($data);
+    }
+
+    public function duplicate(array $params): ?Model
+    {
+        return $this->model->replicate();
     }
 }

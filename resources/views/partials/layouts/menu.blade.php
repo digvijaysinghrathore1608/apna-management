@@ -35,7 +35,7 @@
             </li>
             <li class="menu-item {{ Route::is('microfinance.loanapplication.*') ? 'active' : '' }}">
                 <a href="{{ route('microfinance.loanapplication.index') }}" class="menu-link">
-                    <i class="menu-icon tf-icons bx bxs-user"></i>
+                    <i class="menu-icon tf-icons fa-solid fa-hand-holding-dollar"></i>
                     <div class="text-truncate" data-i18n="{{ translate('loan_applications') }}">
                         {{ translate('loan_applications') }}</div>
                 </a>

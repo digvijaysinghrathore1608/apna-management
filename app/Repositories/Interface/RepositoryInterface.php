@@ -5,6 +5,7 @@ namespace App\Repositories\Interface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Http\Request;
 
 interface RepositoryInterface
 {
@@ -57,4 +58,8 @@ interface RepositoryInterface
     public function delete(array $params): bool;
 
     public function duplicate(array $params): ?Model;
+
+    public function updateOrCreate(array $attributes, array $values = []): Model;
+
+    public function getDataTable(Request $request);
 }

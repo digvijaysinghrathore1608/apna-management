@@ -13,4 +13,14 @@ class Application extends Model
     {
         return $this->belongsTo(Customer::class, 'customer_id');
     }
+
+    public function bank_detail()
+    {
+        return $this->hasOne(BankDetail::class, 'loan_id');
+    }
+
+    public function address()
+    {
+        return $this->hasOne(Address::class, 'loan_id');
+    }
 }

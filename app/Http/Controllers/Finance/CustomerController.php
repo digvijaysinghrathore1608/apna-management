@@ -8,6 +8,7 @@ use App\Http\Requests\Finance\CustomerUpdateRequest;
 use App\Repositories\Interface\Finance\BranchRepositoryInterface;
 use App\Repositories\Interface\Finance\CustomerRepositoryInterface;
 use App\Repositories\Interface\Finance\DocumentsIdRepositoryInterface;
+use App\Repositories\Interface\Finance\FamilyMemberRepositoryInterface;
 use App\Repositories\Interface\Finance\LoanApplicationRepositoryInterface;
 use Devrabiul\ToastMagic\Facades\ToastMagic;
 use Illuminate\Http\Request;
@@ -21,6 +22,7 @@ class CustomerController extends BaseController
         private readonly BranchRepositoryInterface $branchRepo,
         private readonly DocumentsIdRepositoryInterface $documentsIdRepo,
         private readonly LoanApplicationRepositoryInterface $loanApplicationRepo,
+        private readonly FamilyMemberRepositoryInterface $familyMemberRepo,
     ) {}
 
     protected function saveDocument(string $name, string $number, int $relationId): void
@@ -70,7 +72,7 @@ class CustomerController extends BaseController
                 ['name' => 'email', 'label' => 'Email', 'placeholder' => 'Enter email', 'type' => 'email', 'col' => 4],
 
                 // DOB + Gender + Branch
-                ['name' => 'DOB', 'label' => 'Date of Birth', 'type' => 'date', 'required' => true, 'col' => 4],
+                ['name' => 'DOB', 'label' => 'Date of Birth', 'type' => 'date', 'required' => true, 'col' => 4, 'max' => min_dob()],
                 ['name' => 'gender', 'label' => 'Gender', 'type' => 'select', 'options' => genders(), 'required' => true, 'col' => 4],
                 ['name' => 'branch_id', 'label' => 'Branch', 'type' => 'select', 'options' => $branchs, 'required' => true, 'col' => 4],
 
@@ -145,7 +147,7 @@ class CustomerController extends BaseController
                 ['name' => 'email', 'label' => 'Email', 'placeholder' => 'Enter email', 'type' => 'email', 'col' => 4, 'value' => $customer->email],
 
                 // DOB + Gender + Branch
-                ['name' => 'DOB', 'label' => 'Date of Birth', 'type' => 'date', 'required' => true, 'col' => 4, 'value' => $customer->DOB],
+                ['name' => 'DOB', 'label' => 'Date of Birth', 'type' => 'date', 'required' => true, 'col' => 4, 'value' => $customer->DOB, 'max' => min_dob()],
                 ['name' => 'gender', 'label' => 'Gender', 'type' => 'select', 'options' => genders(), 'required' => true, 'col' => 4, 'value' => $customer->gender],
                 ['name' => 'branch_id', 'label' => 'Branch', 'type' => 'select', 'options' => $branchs, 'required' => true, 'col' => 4, 'value' => $customer->branch_id],
 
@@ -184,6 +186,7 @@ class CustomerController extends BaseController
     {
         return $this->handleRequest(function () use ($id) {
             $customer = $this->customerRepo->getFirstWhere(params: ['id' => $id]);
+            $added_by = Auth::id();
 
             if (!$customer) {
                 ToastMagic::error(translate('customer_not_found'));
@@ -201,10 +204,12 @@ class CustomerController extends BaseController
                     return back();
                 }
                 $newLoanId = "TEMP" . now()->timestamp;
-                $this->loanApplicationRepo->add(['loan_id' => $newLoanId, 'customer_id' => $customer->id, 'branch_id' => $customer->branch_id]);
+                $newLoan = $this->loanApplicationRepo->add(['loan_id' => $newLoanId, 'customer_id' => $customer->id, 'branch_id' => $customer->branch_id, 'added_by' => $added_by]);
+                $this->customerRepo->update(id: $customer->id, data: ['current_loan' => $newLoan->id]);
             } else {
                 $newLoanId = "TEMP" . now()->timestamp;
-                $this->loanApplicationRepo->add(['loan_id' => $newLoanId, 'customer_id' => $customer->id, 'branch_id' => $customer->branch_id]);
+                $newLoan = $this->loanApplicationRepo->add(['loan_id' => $newLoanId, 'customer_id' => $customer->id, 'branch_id' => $customer->branch_id, 'added_by' => $added_by]);
+                $this->customerRepo->update(id: $customer->id, data: ['current_loan' => $newLoan->id]);
             }
 
             ToastMagic::success(translate('successfully_generated_new_loan'));

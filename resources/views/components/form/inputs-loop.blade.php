@@ -30,7 +30,7 @@
         @else
             <div class="col-md-{{ $field['col'] ?? 6 }}">
                 <x-form.input :name="$field['name']" :label="$field['label']" :type="$field['type'] ?? 'text'" :placeholder="$field['placeholder'] ?? ''" :value="$field['value'] ?? ''"
-                    :required="$field['required'] ?? false ? 'true' : ''" :options="$field['options'] ?? []" :disabled="$field['disabled'] ?? false" :readonly="$field['readonly'] ?? false" />
+                    :required="$field['required'] ?? false ? 'true' : ''" :options="$field['options'] ?? []" :disabled="$field['disabled'] ?? false" :readonly="$field['readonly'] ?? false" :max="$field['max'] ?? null" />
             </div>
         @endif
     @endforeach

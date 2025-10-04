@@ -3,9 +3,12 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Finance\BranchController;
 use App\Http\Controllers\Finance\CustomerController;
+use App\Http\Controllers\Finance\ExpensesController;
+use App\Http\Controllers\Finance\FamilyController;
 use App\Http\Controllers\Finance\GroupController;
 use App\Http\Controllers\Finance\LoanApplicationController;
 use App\Http\Controllers\Finance\SchemaController;
+use App\Http\Controllers\Finance\WitnessController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'can:microfinance'])
@@ -31,11 +34,28 @@ Route::middleware(['auth', 'can:microfinance'])
                 Route::get('{id}/step1', 'edit')->name('step1');
                 Route::get('{id}/step2', 'edit_step2')->name('step2');
                 Route::get('{id}/step3', 'edit_step3')->name('step3');
+                Route::get('{id}/step4', 'edit_step4')->name('step4');
 
                 Route::patch('{id}/step1', 'update')->name('step1');
-                Route::patch('{id}/step2', 'update_step_2')->name('step2');
-                Route::patch('{id}/step3', 'update_step_3')->name('step3');
-
             });
+            Route::prefix('customers')
+                ->as('customers.')
+                ->group(function () {
+                    Route::resource('family', FamilyController::class)
+                        ->names('family');
+                });
+
+            Route::prefix('loanapplication')
+                ->as('loanapplication.')
+                ->group(function () {
+                    Route::resource('expenses', ExpensesController::class)
+                        ->names('expenses');
+                });
+            Route::prefix('loanapplication')
+                ->as('loanapplication.')
+                ->group(function () {
+                    Route::resource('witness', WitnessController::class)
+                        ->names('witness');
+                });
         });
     });

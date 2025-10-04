@@ -23,10 +23,10 @@ return new class extends Migration
 
             // in law Address
             $table->string('in_law_a_line_1', 100)->nullable();
-            $table->string('i_law_a_line_2', 100)->nullable();
-            $table->string('i_law_a_pincode', 10)->nullable();
-            $table->string('i_law_a_city', 50)->nullable();
-            $table->string('i_law_a_state', 50)->nullable();
+            $table->string('in_law_a_line_2', 100)->nullable();
+            $table->string('in_law_a_pincode', 10)->nullable();
+            $table->string('in_law_a_city', 50)->nullable();
+            $table->string('in_law_a_state', 50)->nullable();
 
             // Permanent Address
             $table->string('p_a_line_1', 100)->nullable();

@@ -115,4 +115,9 @@ class CustomerRepository implements CustomerRepositoryInterface
     {
         return $this->model->replicate();
     }
+    
+    public function updateOrCreate(array $attributes, array $values = []): Model
+    {
+        return $this->model->updateOrCreate($attributes, $values);
+    }
 }

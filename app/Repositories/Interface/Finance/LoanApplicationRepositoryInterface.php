@@ -7,5 +7,5 @@ use Illuminate\Http\Request;
 
 interface LoanApplicationRepositoryInterface extends RepositoryInterface
 {
-    public function getDataTable(Request $request);
+    public function updateOrCreateWithRelations(?int $id, array $data);
 }

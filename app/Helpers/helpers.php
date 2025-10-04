@@ -62,6 +62,14 @@ if (!function_exists('duration_type')) {
     }
 }
 
+if (!function_exists('work_type')) {
+
+    function work_type(): array
+    {
+        return WORK_TYPE;
+    }
+}
+
 if (!function_exists('days')) {
 
     function days(): array
@@ -116,5 +124,12 @@ if (! function_exists('canAny')) {
             }
         }
         return false;
+    }
+}
+
+if (! function_exists('min_dob')) {
+    function min_dob($min_age = MINIMUM_AGE)
+    {
+        return now()->subYears($min_age)->format('Y-m-d');
     }
 }

@@ -102,6 +102,11 @@ class BranchRepository implements BranchRepositoryInterface
         return $this->model->where('id', $id)->update($data);
     }
 
+    public function updateOrCreate(array $attributes, array $values = []): Model
+    {
+        return $this->model->updateOrCreate($attributes, $values);
+    }
+
     public function duplicate(array $params): ?Model
     {
         return $this->model->replicate();

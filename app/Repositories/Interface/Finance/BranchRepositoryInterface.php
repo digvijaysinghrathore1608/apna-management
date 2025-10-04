@@ -7,5 +7,4 @@ use Illuminate\Http\Request;
 
 interface BranchRepositoryInterface extends RepositoryInterface
 {
-    public function getDataTable(Request $request);
 }

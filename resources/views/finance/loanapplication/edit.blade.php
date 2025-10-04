@@ -8,7 +8,7 @@
     </div>
 
     <div class="card p-3 mb-2">
-        <form action="{{ route('microfinance.loanapplication.edit.' . $next_step, $id) }}" method="POST">
+        <form action="{{ $update_route }}" method="POST">
             @csrf
             @method('PATCH')
             <x-form.inputs-loop :fields="$fields" />

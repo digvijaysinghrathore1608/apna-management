@@ -2,19 +2,18 @@
 
 namespace App\Repositories\Finance;
 
-use App\Models\Finance\Application;
-use App\Models\Finance\Customer;
-use App\Repositories\Interface\Finance\LoanApplicationRepositoryInterface;
+use App\Models\Finance\Expenses;
+use App\Repositories\Interface\Finance\LoanExpenseRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Yajra\DataTables\DataTables;
 
-class LoanApplicationRepository implements LoanApplicationRepositoryInterface
+class LoanExpenseRepository implements LoanExpenseRepositoryInterface
 {
     public function __construct(
-        private readonly Application   $model,
+        private readonly Expenses   $model,
     ) {}
     public function getDataTable(Request $request)
     {
@@ -23,23 +22,6 @@ class LoanApplicationRepository implements LoanApplicationRepositoryInterface
 
             return DataTables::of($data)
                 ->addIndexColumn()
-                ->editColumn('actions', function ($row) {
-                    $editUrl   = route('microfinance.loanapplication.edit', $row->id);
-                    $deleteUrl = route('microfinance.loanapplication.destroy', $row->id);
-                    return '
-                                <a href="' . $editUrl . '" class="btn btn-sm btn-primary me-1" title="Edit">
-                                    <i class="fa fa-edit"></i>
-                                </a>
-                                <form action="' . $deleteUrl . '" method="POST" style="display:inline-block;" onsubmit="return confirm(\'Are you sure you want to delete this group?\')">
-                                    ' . csrf_field() . '
-                                    ' . method_field('DELETE') . '
-                                    <button type="submit" class="btn btn-sm btn-danger" title="Delete">
-                                        <i class="fa fa-trash"></i>
-                                    </button>
-                                </form>
-                            ';
-                })
-                ->rawColumns(columns: ['actions'])
                 ->make(true);
         }
 
@@ -110,40 +92,5 @@ class LoanApplicationRepository implements LoanApplicationRepositoryInterface
     public function updateOrCreate(array $attributes, array $values = []): Model
     {
         return $this->model->updateOrCreate($attributes, $values);
-    }
-
-    public function updateOrCreateWithRelations(?int $id, array $data)
-    {
-        // Step 1: find existing record
-        $application = $this->model->find($id);
-
-        // If no existing application found, stop here — don’t create new
-        if (!$application) {
-            return null;
-        }
-
-        // Step 2: update main table
-        if (!empty($data['application'])) {
-            $application->fill($data['application']);
-            $application->save();
-        }
-
-        // Step 3: update related Address (if present)
-        if (!empty($data['address'])) {
-            $application->address()->updateOrCreate(
-                ['loan_id' => $application->id],
-                $data['address']
-            );
-        }
-
-        // Step 4: update related Bank Detail (if present)
-        if (!empty($data['bank_detail'])) {
-            $application->bank_detail()->updateOrCreate(
-                ['loan_id' => $application->id],
-                $data['bank_detail']
-            );
-        }
-
-        return $application;
     }
 }

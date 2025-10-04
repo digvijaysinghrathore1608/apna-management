@@ -43,4 +43,9 @@ class Customer extends Model
         return $this->hasMany(DocumentIdentities::class, 'relation_id')
             ->where('relation_table_name', $this->getTable());
     }
+
+    public function family_members()
+    {
+        return $this->hasMany(CustomerFamilyMember::class, 'customer_id');
+    }
 }

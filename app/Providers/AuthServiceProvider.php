@@ -32,20 +32,22 @@ class AuthServiceProvider extends ServiceProvider
             }
         });
 
-        // Dynamically define service permissions
-        Service::with('roles')->get()->each(function ($service) {
-            $service->roles->each(function ($role) use ($service) {
-                $ability = $service->name . '.' . $role->name;
+        if (\Illuminate\Support\Facades\Schema::hasTable('services')) {
+            // Dynamically define service permissions
+            Service::with('roles')->get()->each(function ($service) {
+                $service->roles->each(function ($role) use ($service) {
+                    $ability = $service->name . '.' . $role->name;
 
-                Gate::define($ability, function ($user) use ($service, $role) {
-                    return $user->hasServiceRole($service->name, $role->name);
+                    Gate::define($ability, function ($user) use ($service, $role) {
+                        return $user->hasServiceRole($service->name, $role->name);
+                    });
+                });
+
+                // Optional: generic "service only" ability
+                Gate::define($service->name, function ($user) use ($service) {
+                    return $user->hasService($service->name);
                 });
             });
-
-            // Optional: generic "service only" ability
-            Gate::define($service->name, function ($user) use ($service) {
-                return $user->hasService($service->name);
-            });
-        });
+        }
     }
 }

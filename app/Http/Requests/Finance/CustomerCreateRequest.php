@@ -41,7 +41,7 @@ class CustomerCreateRequest extends FormRequest
             'DOB' => [
                 'required',
                 'date',
-                'before_or_equal:' . now()->subYears(MINIMUM_AGE)->format('Y-m-d'),
+                'before_or_equal:' . min_dob(),
             ],
             'gender' => [
                 'required',

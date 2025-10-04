@@ -7,5 +7,4 @@ use Illuminate\Http\Request;
 
 interface GroupMemberRepositoryInterface extends RepositoryInterface
 {
-    public function getDataTable(Request $request);
 }

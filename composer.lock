@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bfc143a316136da78a5bf8016b81fe6f",
+    "content-hash": "e1f9c33a4e7d61b1802054c9cd0bbcc6",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -600,6 +600,69 @@
                 "source": "https://github.com/crwlrsoft/query-string"
             },
             "time": "2023-04-12T21:31:58+00:00"
+        },
+        {
+            "name": "devrabiul/laravel-toaster-magic",
+            "version": "v1.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/devrabiul/laravel-toaster-magic.git",
+                "reference": "7b5fa3a5d05cb57ac72bbef991a476c219c67829"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/devrabiul/laravel-toaster-magic/zipball/7b5fa3a5d05cb57ac72bbef991a476c219c67829",
+                "reference": "7b5fa3a5d05cb57ac72bbef991a476c219c67829",
+                "shasum": ""
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "ToastMagic": "Devrabiul\\ToastMagic\\Facades\\ToastMagic"
+                    },
+                    "providers": [
+                        "Devrabiul\\ToastMagic\\ToastMagicServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Devrabiul\\ToastMagic\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Muhammad Rabiul",
+                    "email": "devrabiul@gmail.com",
+                    "homepage": "https://rixetbd.com",
+                    "role": "Software Engineer"
+                }
+            ],
+            "description": "Laravel Toaster Magic is a lightweight, flexible toast library for Laravel projects, with no jQuery, Bootstrap, or Tailwind dependency.",
+            "homepage": "https://github.com/devrabiul/laravel-toaster-magic",
+            "keywords": [
+                "dynamic-notifications",
+                "flash-notifications",
+                "laravel",
+                "laravel-toastr",
+                "livewire",
+                "livewire-toaster",
+                "magic",
+                "notifications",
+                "php",
+                "toaster",
+                "toastr"
+            ],
+            "support": {
+                "issues": "https://github.com/devrabiul/laravel-toaster-magic/issues",
+                "source": "https://github.com/devrabiul/laravel-toaster-magic/tree/v1.4"
+            },
+            "time": "2025-08-20T16:20:36+00:00"
         },
         {
             "name": "dflydev/dot-access-data",
@@ -7057,6 +7120,95 @@
                 "source": "https://github.com/webmozarts/assert/tree/1.11.0"
             },
             "time": "2022-06-03T18:03:27+00:00"
+        },
+        {
+            "name": "yajra/laravel-datatables-oracle",
+            "version": "v12.4.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/yajra/laravel-datatables.git",
+                "reference": "7b5f1f5454ab46f9bb735c23f67c3a88b70e0e4a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/yajra/laravel-datatables/zipball/7b5f1f5454ab46f9bb735c23f67c3a88b70e0e4a",
+                "reference": "7b5f1f5454ab46f9bb735c23f67c3a88b70e0e4a",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/database": "^12",
+                "illuminate/filesystem": "^12",
+                "illuminate/http": "^12",
+                "illuminate/support": "^12",
+                "illuminate/view": "^12",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "algolia/algoliasearch-client-php": "^3.4.1",
+                "larastan/larastan": "^3.1.0",
+                "laravel/pint": "^1.14",
+                "laravel/scout": "^10.8.3",
+                "meilisearch/meilisearch-php": "^1.6.1",
+                "orchestra/testbench": "^10",
+                "rector/rector": "^2.0"
+            },
+            "suggest": {
+                "yajra/laravel-datatables-buttons": "Plugin for server-side exporting of dataTables.",
+                "yajra/laravel-datatables-editor": "Plugin to use DataTables Editor (requires a license).",
+                "yajra/laravel-datatables-export": "Plugin for server-side exporting using livewire and queue worker.",
+                "yajra/laravel-datatables-fractal": "Plugin for server-side response using Fractal.",
+                "yajra/laravel-datatables-html": "Plugin for server-side HTML builder of dataTables."
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "DataTables": "Yajra\\DataTables\\Facades\\DataTables"
+                    },
+                    "providers": [
+                        "Yajra\\DataTables\\DataTablesServiceProvider"
+                    ]
+                },
+                "branch-alias": {
+                    "dev-master": "12.x-dev"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/helper.php"
+                ],
+                "psr-4": {
+                    "Yajra\\DataTables\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Arjay Angeles",
+                    "email": "aqangeles@gmail.com"
+                }
+            ],
+            "description": "jQuery DataTables API for Laravel",
+            "keywords": [
+                "datatables",
+                "jquery",
+                "laravel",
+                "yajra"
+            ],
+            "support": {
+                "issues": "https://github.com/yajra/laravel-datatables/issues",
+                "source": "https://github.com/yajra/laravel-datatables/tree/v12.4.2"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/sponsors/yajra",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-09-09T12:14:05+00:00"
         }
     ],
     "packages-dev": [

@@ -6,6 +6,12 @@ provider:
   name: aws
   region: ap-south-1
   runtime: provided.al2
+
+  deploymentBucket:
+    name: apna-management-serverless-${sls:stage}
+    blockPublicAccess: true
+    maxPreviousDeploymentArtifacts: 3
+    
   environment:
     APP_ENV: ${sls:stage}
     APP_NAME: ${ssm:/apna/${sls:stage}/APP_NAME}
@@ -72,6 +78,7 @@ functions:
   web:
     handler: public/index.php
     timeout: 28
+    role: LambdaExecutionRole
     layers:
       - ${bref:layer.php-82-fpm}
     events:

@@ -8,14 +8,15 @@
     </div>
 
     <div class="card p-3 mb-2">
-        <form action="{{ $update_route }}" method="POST">
+        <form action="{{ $update_route }}" method="POST" @if ($submit_disable) onsubmit="return false;" @endif>
             @csrf
             @method('PATCH')
             <x-form.inputs-loop :fields="$fields" />
 
             {{-- Submit Button --}}
             <div class="mt-3">
-                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="submit" class="btn btn-primary"
+                    @if ($submit_disable) disabled @endif>{{ $submit_label }}</button>
                 <a href="{{ route('microfinance.loanapplication.index') }}" class="btn btn-secondary">Cancel</a>
             </div>
         </form>

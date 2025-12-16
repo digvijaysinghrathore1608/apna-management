@@ -16,6 +16,8 @@ class SuperAdminSeeder extends Seeder
         // Create roles
         $roles = [
             'super_admin',
+            'admin',
+            'user',
             'default',
         ];
         $roleIds = [];
@@ -28,6 +30,7 @@ class SuperAdminSeeder extends Seeder
         $services = [
             'welcome',
             'microfinance',
+            'services'
         ];
         $serviceIds = [];
         foreach ($services as $serviceName) {

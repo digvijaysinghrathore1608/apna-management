@@ -198,7 +198,9 @@ class LoanApplicationController extends Controller
             ];
 
             $update_route = route('microfinance.loanapplication.edit.step1', $id);
-            return view('finance.loanapplication.edit', compact('fields', 'id', 'update_route'));
+            $submit_label = 'Save and Continue to Step 2';
+            $submit_disable = false;
+            return view('finance.loanapplication.edit', compact('fields', 'id', 'update_route', 'submit_label', 'submit_disable'));
         });
     }
 

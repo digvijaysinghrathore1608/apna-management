@@ -68,5 +68,21 @@
         </ul>
     @endcan
 
+    @can('services')
+        <ul class="menu-inner py-1">
+            <!-- Apps & Pages -->
+            <li class="menu-header small text-uppercase">
+                <span class="menu-header-text">{{ translate('services') }}</span>
+            </li>
+
+            <li class="menu-item {{ Route::is('services.email.*') ? 'active' : '' }}">
+                <a href="{{ route('services.email.index') }}" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-envelope"></i>
+                    <div class="text-truncate" data-i18n="{{ translate('email') }}">{{ translate('email') }}</div>
+                </a>
+            </li>
+        </ul>
+    @endcan
+
 </aside>
 <!-- / Menu -->

@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\BusinessSetting;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Gate;
 
@@ -131,5 +133,24 @@ if (! function_exists('min_dob')) {
     function min_dob($min_age = MINIMUM_AGE)
     {
         return now()->subYears($min_age)->format('Y-m-d');
+    }
+}
+
+if (!function_exists('business_setting_all')) {
+    function business_setting_all()
+    {
+        return Cache::remember('business_setting_all', 60, function () {
+            return BusinessSetting::all();
+        });
+    }
+}
+
+if (!function_exists('business_setting_by_key')) {
+    function business_setting_by_key($key, $default = null)
+    {
+        return business_setting_all()
+            ->keyBy('key')
+            ->get($key)
+            ->value ?? $default;
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Services;
 
 use App\Http\Controllers\BaseController as Controller;
+use App\Models\BusinessSetting;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -77,7 +78,15 @@ class EmailController extends Controller
                 'email' => 'nullable|email',
             ]);
 
-            $to = "dsrathore9549@gmail.com";
+
+            $to = business_setting_by_key('contact_query_receiver_mail');
+
+            if (empty($to)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Sender mail not found',
+                ], 404);
+            }
 
             $siteName = $request->site_name ?? "Contact Form";
             $currentTime = Carbon::now()

@@ -21,13 +21,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Blade::if('canAny', function (...$abilities) {
-            foreach ($abilities as $ability) {
-                if (Gate::allows($ability)) {
-                    return true;
-                }
-            }
-            return false;
-        });
+        
     }
 }

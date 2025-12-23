@@ -21,15 +21,6 @@ on:
           - "NO"  
           - "YES"  
 
-      confirm_assets_update:
-        description: 'Choose YES to run update assets'
-        required: true
-        default: 'NO'  
-        type: choice
-        options:
-          - "NO"  
-          - "YES" 
-
   push:
     branches:
       - stage         
@@ -107,17 +98,3 @@ jobs:
       - name: Run Seed
         if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/stage') }}  
         run: php artisan db:seed --class=SuperAdminSeeder
-
-
-      - name: Upload Assets to S3
-        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.confirm_assets_update == 'YES' }}
-        run: |
-          AWS_BUCKET=${{ secrets.AWS_S3_PREFIX }}-${{ github.event.inputs.environment || 'stage' }}
-          # sync files
-          aws s3 sync public/assets s3://$AWS_BUCKET/assets/ --delete
-          aws s3 sync public/fonts s3://$AWS_BUCKET/fonts/ --delete
-          aws s3 cp public/favicon.ico s3://$AWS_BUCKET/favicon.ico
-          
-          # Optional: Invalidate CloudFront cache
-          CLOUDFRONT_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?Origins.Items[0].DomainName=='$AWS_BUCKET.s3.ap-south-1.amazonaws.com'].Id | [0]" --output text)
-          aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_ID --paths "/*"  

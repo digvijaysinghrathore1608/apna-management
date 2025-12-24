@@ -91,22 +91,6 @@ functions:
     events:
       - httpApi: '*'
 
-  queue-worker:
-    handler: artisan
-    timeout: 60
-    role: LambdaExecutionRole
-    layers:
-      - ${bref:layer.php-82}
-    environment:
-      BREF_LARAVEL_QUEUE: "true"  
-    events:
-      - sqs:
-          arn:
-            Fn::GetAtt:
-              - SQSQueue
-              - Arn
-          batchSize: 1    
-
 custom:
   roles:
     stage: apna-management-lambda-role
@@ -131,25 +115,10 @@ resources:
           - arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess
           - arn:aws:iam::aws:policy/AmazonS3FullAccess
 
-        Policies:
-          - PolicyName: SQSPermissions
-            PolicyDocument:
-              Version: "2012-10-17"
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - sqs:SendMessage
-                    - sqs:ReceiveMessage
-                    - sqs:DeleteMessage
-                    - sqs:GetQueueAttributes
-                  Resource:
-                    - arn:aws:sqs:ap-south-1:*:apna-queue-${sls:stage}  
-
     SQSQueue:
       Type: AWS::SQS::Queue
       Properties:
-        QueueName: apna-queue-${sls:stage}   
-        VisibilityTimeout: 120   
+        QueueName: apna-queue-${sls:stage}      
 
     DynamoDBTable:
       Type: AWS::DynamoDB::Table

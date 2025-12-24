@@ -4,6 +4,7 @@ use App\Models\BusinessSetting;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Http;
 
 if (!function_exists('assetOrDefault')) {
     /**
@@ -206,5 +207,65 @@ if (!function_exists('encrypt_RSA')) {
         }
 
         return null;
+    }
+}
+
+if (!function_exists('digilocker_verification_status')) {
+    function digilocker_verification_status(string $referenceId, string $verificationId)
+    {
+        $response = Http::withHeaders([
+            'x-client-id'     => config('services.cashfree.client_id'),
+            'x-client-secret' => config('services.cashfree.client_secret'),
+            'x-cf-signature'     => get_cashfree_signature(),
+        ])->get(
+            config('services.cashfree.base_url') . '/verification/digilocker',
+            [
+                'reference_id'    => $referenceId,
+                'verification_id' => $verificationId,
+            ]
+        );
+
+        if ($response->failed()) {
+            return [
+                'status'  => false,
+                'message' => 'Cashfree Verification API failed',
+                'error'   => $response->json(),
+            ];
+        }
+
+        return [
+            'status' => true,
+            'data'   => $response->json(),
+        ];
+    }
+}
+
+if (!function_exists('digilocker_document_fetch')) {
+    function digilocker_document_fetch(string $document_type, string $verification_id, string $reference_id)
+    {
+        $response = Http::withHeaders([
+            'x-client-id'     => config('services.cashfree.client_id'),
+            'x-client-secret' => config('services.cashfree.client_secret'),
+            'x-cf-signature'     => get_cashfree_signature(),
+        ])->get(
+            config('services.cashfree.base_url') . '/verification/digilocker/document/' . $document_type,
+            [
+                'verification_id' => $verification_id,
+                'reference_id' => $reference_id,
+            ]
+        );
+
+        if ($response->failed()) {
+            return [
+                'status'  => false,
+                'message' => 'Cashfree Document Fetch API failed',
+                'error'   => $response->json(),
+            ];
+        }
+
+        return [
+            'status' => true,
+            'data'   => $response->json(),
+        ];
     }
 }

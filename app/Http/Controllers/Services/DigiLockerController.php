@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Services;
 
 use App\Http\Controllers\BaseController as Controller;
+use App\Jobs\DigiLocker\DocumentFetchJob;
 use App\Models\DigiLocker\DigiLockerRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\Validator;
 class DigiLockerController extends Controller
 {
 
+    // Digilocker callback URL
     public function callback(Request $request)
     {
         try {
@@ -29,7 +31,7 @@ class DigiLockerController extends Controller
 
             if ($digilocker_request->csf_digilocker_status == 'pending' || $digilocker_request->csf_digilocker_status == 'created') {
 
-                $digilocker_status_response = $this->verification_status(
+                $digilocker_status_response = digilocker_verification_status(
                     $digilocker_request->csf_reference_id,
                     $digilocker_request->verification_id
                 );
@@ -46,6 +48,14 @@ class DigiLockerController extends Controller
                 $digilocker_request->csf_document_consent = $digilocker_status_response['data']['document_consent'] ?? null;
                 $digilocker_request->csf_status_response_body = json_encode($digilocker_status_response['data']);
                 $digilocker_request->save();
+
+                if ($status == 'authenticated') {
+                    Log::info('Digilocker Verification Completed: ', [
+                        'verification_id' => $digilocker_request->verification_id,
+                    ]);
+
+                    DocumentFetchJob::dispatch($digilocker_request->verification_id);
+                }
             }
 
 
@@ -65,7 +75,7 @@ class DigiLockerController extends Controller
         }
     }
 
-
+    //Initiate digilocker verification
     public function initiate(Request $request)
     {
         DB::beginTransaction();
@@ -133,7 +143,7 @@ class DigiLockerController extends Controller
                 'status' => true,
                 'data' => [
                     'verification_id' => $create_url_response['data']['verification_id'],
-                    'url' => $create_url_response['data']['url']
+                    'digilocker_url' => $create_url_response['data']['url']
                 ]
             ]);
         } catch (\Throwable $e) {
@@ -148,32 +158,68 @@ class DigiLockerController extends Controller
         }
     }
 
-    private function verification_status(string $referenceId, string $verificationId)
+    public function check_status($verification_id)
     {
-        $response = Http::withHeaders([
-            'x-client-id'     => config('services.cashfree.client_id'),
-            'x-client-secret' => config('services.cashfree.client_secret'),
-            'x-cf-signature'     => get_cashfree_signature(),
-        ])->get(
-            config('services.cashfree.base_url') . '/verification/digilocker',
-            [
-                'reference_id'    => $referenceId,
-                'verification_id' => $verificationId,
-            ]
-        );
+        try {
+            $digilocker_request = DigiLockerRequest::where('verification_id', $verification_id)->first();
 
-        if ($response->failed()) {
-            return [
-                'status'  => false,
-                'message' => 'Cashfree Verification API failed',
-                'error'   => $response->json(),
-            ];
+            if (!$digilocker_request) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Invalid verification_id'
+                ], 404);
+            }
+
+            if ($digilocker_request->csf_digilocker_status == 'pending' || $digilocker_request->csf_digilocker_status == 'created') {
+
+                $digilocker_status_response = digilocker_verification_status(
+                    $digilocker_request->csf_reference_id,
+                    $digilocker_request->verification_id
+                );
+
+                if (!$digilocker_status_response['status']) {
+                    Log::error('Digilocker Verify Account Error: ', $digilocker_status_response);
+                    throw new \Exception($digilocker_status_response['message']);
+                }
+                Log::debug('Digilocker Status Response: ', $digilocker_status_response);
+
+                $status = strtolower($digilocker_status_response['data']['status']);
+
+                $digilocker_request->csf_digilocker_status = $status;
+                $digilocker_request->csf_document_consent = $digilocker_status_response['data']['document_consent'] ?? null;
+                $digilocker_request->csf_status_response_body = json_encode($digilocker_status_response['data']);
+                $digilocker_request->save();
+
+                if ($status == 'authenticated') {
+                    Log::info('Digilocker Verification Completed: ', [
+                        'verification_id' => $digilocker_request->verification_id,
+                    ]);
+
+                    DocumentFetchJob::dispatch($digilocker_request->verification_id);
+                }
+            }
+            Log::debug('Digilocker Status Retrieved from DB: ', [
+                'csf_digilocker_status' => $digilocker_request->csf_digilocker_status,
+                'verification_id' => $digilocker_request->verification_id,
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'data' => [
+                    'verification_id' => $digilocker_request->verification_id,
+                    'csf_digilocker_status' => $digilocker_request->csf_digilocker_status,
+                    'csf_document_consent' => $digilocker_request->csf_document_consent,
+                    'csf_status_response_body' => json_decode($digilocker_request->csf_status_response_body),
+                ]
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Check status failed',
+                'error' => $e->getMessage(),
+
+            ], 500);
         }
-
-        return [
-            'status' => true,
-            'data'   => $response->json(),
-        ];
     }
 
 

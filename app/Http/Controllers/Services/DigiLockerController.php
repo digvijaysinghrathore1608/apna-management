@@ -36,7 +36,7 @@ class DigiLockerController extends Controller
                 Log::error('Digilocker Verify Account Error: ', $digilocker_status_response);
                 throw new \Exception($digilocker_status_response['message']);
             }
-            Log::success('Digilocker Status Response: ', $digilocker_status_response);
+            Log::debug('Digilocker Status Response: ', $digilocker_status_response);
 
             $status = strtolower($digilocker_status_response['data']['status']);
 
@@ -55,6 +55,7 @@ class DigiLockerController extends Controller
             ], 500);
         }
     }
+
 
     public function initiate(Request $request)
     {
@@ -92,7 +93,7 @@ class DigiLockerController extends Controller
                 Log::error('Digilocker Verify Account Error: ', $verify_response);
                 throw new \Exception($verify_response['message']);
             }
-            Log::success('Digilocker Verify Account Response: ', $verify_response);
+            Log::debug('Digilocker Verify Account Response: ', $verify_response);
 
             // create url flow
             $status = strtolower($verify_response['data']['status']);
@@ -109,7 +110,7 @@ class DigiLockerController extends Controller
                 Log::error('Digilocker Create URL Error: ', $create_url_response);
                 throw new \Exception($create_url_response['message']);
             }
-            Log::success('Digilocker Create URL Response: ', $create_url_response);
+            Log::debug('Digilocker Create URL Response: ', $create_url_response);
 
             $digilocker_request->csf_reference_id = $create_url_response['data']['reference_id'];
             $digilocker_request->csf_digilocker_status = strtolower($create_url_response['data']['status']);
@@ -117,7 +118,7 @@ class DigiLockerController extends Controller
 
             DB::commit();
 
-            Log::success('Digilocker Initiate Response: ', $create_url_response);
+            Log::debug('Digilocker Initiate Response: ', $create_url_response);
 
             return response()->json([
                 'status' => true,
@@ -140,6 +141,7 @@ class DigiLockerController extends Controller
         $response = Http::withHeaders([
             'x-client-id'     => config('services.cashfree.client_id'),
             'x-client-secret' => config('services.cashfree.client_secret'),
+            'x-signature'     => get_cashfree_signature(),
         ])->get(
             config('services.cashfree.base_url') . '/verification/digilocker',
             [
@@ -170,6 +172,7 @@ class DigiLockerController extends Controller
             'Content-Type'    => 'application/json',
             'x-client-id'     => config('services.cashfree.client_id'),
             'x-client-secret' => config('services.cashfree.client_secret'),
+            'x-signature'     => get_cashfree_signature(),
         ])->post(
             config('services.cashfree.base_url') . '/verification/digilocker/verify-account',
             [
@@ -198,6 +201,7 @@ class DigiLockerController extends Controller
             'Content-Type'     => 'application/json',
             'x-client-id'      => config('services.cashfree.client_id'),
             'x-client-secret' => config('services.cashfree.client_secret'),
+            'x-signature'     => get_cashfree_signature(),
         ])->post(
             config('services.cashfree.base_url') . '/verification/digilocker',
             [

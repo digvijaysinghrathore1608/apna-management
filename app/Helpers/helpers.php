@@ -154,3 +154,57 @@ if (!function_exists('business_setting_by_key')) {
             ->value ?? $default;
     }
 }
+
+
+if (!function_exists('get_cashfree_public_key')) {
+
+    function get_cashfree_public_key()
+    {
+        $key = env('CASHFREE_PUBLIC_KEY');
+
+        if (!$key) {
+            throw new \Exception('Public key not found in ENV');
+        }
+
+        // \n ko actual newline me convert
+        $key = str_replace('\n', PHP_EOL, $key);
+
+        return openssl_pkey_get_public($key);
+    }
+}
+
+
+if (!function_exists('get_cashfree_signature')) {
+
+    function get_cashfree_signature()
+    {
+        $clientId = config('services.cashfree.client_id');
+
+        $publicKey = get_cashfree_public_key();
+
+        if (!$publicKey) {
+            throw new \Exception('Invalid public key');
+        }
+
+        $encodedData = $clientId . "." . time();
+
+        return encrypt_RSA($encodedData, $publicKey);
+    }
+}
+
+if (!function_exists('encrypt_RSA')) {
+
+    function encrypt_RSA($plainData, $publicKey)
+    {
+        if (openssl_public_encrypt(
+            $plainData,
+            $encrypted,
+            $publicKey,
+            OPENSSL_PKCS1_OAEP_PADDING
+        )) {
+            return base64_encode($encrypted);
+        }
+
+        return null;
+    }
+}

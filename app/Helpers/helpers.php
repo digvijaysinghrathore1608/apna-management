@@ -321,7 +321,7 @@ if (!function_exists('digilocaker_fetch_documents')) {
 
                 DigiLockerDocuments::create([
                     'verification_id' => $digilocker_request->id,
-                    'document_name'   => $document_name,
+                    'document_name'   => strtolower($document_name),
                     'response_body'   => json_encode($fetch_docs_response['data']),
                 ]);
             }

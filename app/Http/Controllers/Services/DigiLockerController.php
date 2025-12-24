@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Services;
 
 use App\Http\Controllers\BaseController as Controller;
+use App\Models\DigiLocker\DigiLockerDocuments;
 use App\Models\DigiLocker\DigiLockerRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -215,6 +216,59 @@ class DigiLockerController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Check status failed',
+                'error' => $e->getMessage(),
+
+            ], 500);
+        }
+    }
+
+    public function fetch_document(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'verification_id'     => 'required|string',
+                'document_name'     => 'required|string',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validation error',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $digilocker_request = DigiLockerRequest::where('verification_id', $request->verification_id)->first();
+            if (!$digilocker_request) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Invalid verification_id'
+                ], 404);
+            }
+
+            $fetch_document = DigiLockerDocuments::where('verification_id', $digilocker_request->id)
+                ->where('document_name', $request->document_name)
+                ->first();
+
+            if (!$fetch_document) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'document not found'
+                ], 404);
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Document fetched successfully',
+                'data' => [
+                    'document_name' => $fetch_document->document_name,
+                    'response_body' => json_decode($fetch_document->response_body),
+                ]
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Document fetch failed',
                 'error' => $e->getMessage(),
 
             ], 500);

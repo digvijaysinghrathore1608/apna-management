@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Services;
+namespace App\Http\Controllers\DigiLocker;
 
 use App\Http\Controllers\BaseController as Controller;
 use App\Models\DigiLocker\DigiLockerDocuments;
@@ -95,14 +95,14 @@ class DigiLockerController extends Controller
             }
 
             $digilocker_request = new DigiLockerRequest();
-            $digilocker_request->requester_id = $request->client->id;
-            $digilocker_request->verification_id = $request->client->id . '_' . $request->identify_number . '_' . time();
+            $digilocker_request->requester_id = 'N/A';
+            $digilocker_request->verification_id = $request->identify_number . '_' . time();
             $digilocker_request->identify_number = $request->identify_number;
             $digilocker_request->documents_requested = json_encode($request->document_requested);
             $digilocker_request->request_body = json_encode($request->except('client'));
             $digilocker_request->save();
 
-            $verify_response = $this->verify_account(
+            $verify_response = csf_verify_account(
                 $digilocker_request->verification_id,
                 $digilocker_request->identify_number,
                 $request->identify_type
@@ -118,7 +118,7 @@ class DigiLockerController extends Controller
             $status = strtolower($verify_response['data']['status']);
             $csf_user_flow = $status === 'account_exists' ? 'signin' : 'signup';
 
-            $create_url_response = $this->create_url(
+            $create_url_response = csf_create_url(
                 $digilocker_request->verification_id,
                 $request->document_requested,
                 route('digilocker.callback'), // Assuming you have a route named 'digilocker.callback'
@@ -158,6 +158,7 @@ class DigiLockerController extends Controller
         }
     }
 
+    //check digilocker status
     public function check_status($verification_id)
     {
         try {
@@ -222,6 +223,7 @@ class DigiLockerController extends Controller
         }
     }
 
+    //get document details
     public function fetch_document(Request $request)
     {
         try {
@@ -273,66 +275,5 @@ class DigiLockerController extends Controller
 
             ], 500);
         }
-    }
-
-
-    // verify account with Cashfree DigiLocker API
-    private function verify_account($verification_id, $identify_number, $identify_type)
-    {
-        $response = Http::withHeaders([
-            'Content-Type'    => 'application/json',
-            'x-client-id'     => config('services.cashfree.client_id'),
-            'x-client-secret' => config('services.cashfree.client_secret'),
-            'x-cf-signature'     => get_cashfree_signature(),
-        ])->post(
-            config('services.cashfree.base_url') . '/verification/digilocker/verify-account',
-            [
-                'verification_id' => $verification_id,
-                $identify_type == 'aadhar' ? 'aadhaar_number' : 'mobile_number' => $identify_number,
-            ]
-        );
-
-        if ($response->failed()) {
-            return [
-                'status'  => false,
-                'message' => 'Cashfree Verify Account API failed',
-                'error'   => $response->json(),
-            ];
-        }
-
-        return [
-            'status' => true,
-            'data'   => $response->json(),
-        ];
-    }
-
-    private function create_url($verification_id, $document_requested, $redirect_url, $user_flow)
-    {
-        $response = Http::withHeaders([
-            'Content-Type'     => 'application/json',
-            'x-client-id'      => config('services.cashfree.client_id'),
-            'x-client-secret' => config('services.cashfree.client_secret'),
-            'x-cf-signature'     => get_cashfree_signature(),
-        ])->post(
-            config('services.cashfree.base_url') . '/verification/digilocker',
-            [
-                'verification_id'    => $verification_id,
-                'document_requested' => $document_requested,
-                'redirect_url'       => $redirect_url,
-                'user_flow'          => $user_flow,
-            ]
-        );
-
-        if ($response->failed()) {
-            return [
-                'status'  => false,
-                'message' => 'Cashfree Create URL API failed',
-                'error'   => $response->json(),
-            ];
-        }
-        return [
-            'status' => true,
-            'data'   => $response->json(),
-        ];
     }
 }

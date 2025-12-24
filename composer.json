@@ -37,7 +37,8 @@
         "files": [
             "app/Helpers/helpers.php",
             "app/Helpers/finance.php",
-            "app/Utils/constant.php"
+            "app/Utils/constant.php",
+            "app/Helpers/digilocker.php"
         ]
     },
     "autoload-dev": {

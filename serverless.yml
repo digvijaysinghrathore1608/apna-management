@@ -92,7 +92,7 @@ functions:
       - httpApi: '*'
 
   queue-worker:
-    handler: artisan
+    handler: vendor/bref/laravel-bridge/src/Queue/QueueHandler.php
     timeout: 60
     role: LambdaExecutionRole
     layers:

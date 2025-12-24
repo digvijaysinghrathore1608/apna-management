@@ -76,6 +76,8 @@ provider:
     CASHFREE_CLIENT_ID: ${ssm:/apna/${sls:stage}/CASHFREE_CLIENT_ID}
     CASHFREE_CLIENT_SECRET: ${ssm:/apna/${sls:stage}/CASHFREE_CLIENT_SECRET}
 
+    CASHFREE_PUBLIC_KEY: ${ssm:/apna/${sls:stage}/CASHFREE_PUBLIC_KEY}
+
 plugins:
   - ./vendor/bref/bref
 

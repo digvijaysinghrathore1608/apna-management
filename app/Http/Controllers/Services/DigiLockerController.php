@@ -141,7 +141,7 @@ class DigiLockerController extends Controller
         $response = Http::withHeaders([
             'x-client-id'     => config('services.cashfree.client_id'),
             'x-client-secret' => config('services.cashfree.client_secret'),
-            'x-signature'     => get_cashfree_signature(),
+            'x-cf-signature'     => get_cashfree_signature(),
         ])->get(
             config('services.cashfree.base_url') . '/verification/digilocker',
             [
@@ -172,7 +172,7 @@ class DigiLockerController extends Controller
             'Content-Type'    => 'application/json',
             'x-client-id'     => config('services.cashfree.client_id'),
             'x-client-secret' => config('services.cashfree.client_secret'),
-            'x-signature'     => get_cashfree_signature(),
+            'x-cf-signature'     => get_cashfree_signature(),
         ])->post(
             config('services.cashfree.base_url') . '/verification/digilocker/verify-account',
             [
@@ -201,7 +201,7 @@ class DigiLockerController extends Controller
             'Content-Type'     => 'application/json',
             'x-client-id'      => config('services.cashfree.client_id'),
             'x-client-secret' => config('services.cashfree.client_secret'),
-            'x-signature'     => get_cashfree_signature(),
+            'x-cf-signature'     => get_cashfree_signature(),
         ])->post(
             config('services.cashfree.base_url') . '/verification/digilocker',
             [

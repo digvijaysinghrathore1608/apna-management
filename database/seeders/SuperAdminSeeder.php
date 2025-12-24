@@ -30,7 +30,8 @@ class SuperAdminSeeder extends Seeder
         $services = [
             'welcome',
             'microfinance',
-            'services'
+            'services',
+            'digilocker'
         ];
         $serviceIds = [];
         foreach ($services as $serviceName) {

@@ -1,0 +1,2 @@
+cat cashfree_private.pem | awk '{printf "%s\\n", $0}'
+

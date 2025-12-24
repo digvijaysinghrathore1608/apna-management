@@ -71,6 +71,13 @@ provider:
     AWS_BUCKET: ${ssm:/apna/${sls:stage}/AWS_BUCKET}
     AWS_URL: ${ssm:/apna/${sls:stage}/AWS_URL}
 
+    #cashfree
+    CASHFREE_BASE_URL: ${ssm:/apna/${sls:stage}/CASHFREE_BASE_URL}
+    CASHFREE_CLIENT_ID: ${ssm:/apna/${sls:stage}/CASHFREE_CLIENT_ID}
+    CASHFREE_CLIENT_SECRET: ${ssm:/apna/${sls:stage}/CASHFREE_CLIENT_SECRET}
+
+    CASHFREE_PUBLIC_KEY: ${ssm:/apna/${sls:stage}/CASHFREE_PUBLIC_KEY}
+
 plugins:
   - ./vendor/bref/bref
 

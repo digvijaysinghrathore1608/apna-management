@@ -1,9 +1,13 @@
 <?php
 
 use App\Models\BusinessSetting;
+use App\Models\DigiLocker\DigiLockerDocuments;
+use App\Models\DigiLocker\DigiLockerRequest;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 if (!function_exists('assetOrDefault')) {
     /**

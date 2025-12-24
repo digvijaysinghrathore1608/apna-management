@@ -1,22 +1,18 @@
 #!/usr/bin/env php
 <?php
 
-use Illuminate\Contracts\Console\Kernel;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Foundation\Application;
+use Symfony\Component\Console\Input\ArgvInput;
 
 define('LARAVEL_START', microtime(true));
 
+// Register the Composer autoloader...
 require __DIR__.'/vendor/autoload.php';
 
-$app = require __DIR__.'/bootstrap/app.php';
+// Bootstrap Laravel and handle the command...
+/** @var Application $app */
+$app = require_once __DIR__.'/bootstrap/app.php';
 
-$app->make(Kernel::class)->bootstrap();
+$status = $app->handleCommand(new ArgvInput);
 
-// 🔥 Run exactly ONE queue job
-Artisan::call('queue:work', [
-    '--once' => true,
-    '--sleep' => 0,
-    '--tries' => 3,
-]);
-
-return 0;
+exit($status);

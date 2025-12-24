@@ -92,11 +92,13 @@ functions:
       - httpApi: '*'
 
   queue-worker:
-    handler: vendor/bref/laravel-bridge/src/Queue/QueueHandler.php
+    handler: artisan
     timeout: 60
     role: LambdaExecutionRole
     layers:
       - ${bref:layer.php-82}
+    environment:
+      BREF_LARAVEL_QUEUE: "true"  
     events:
       - sqs:
           arn:

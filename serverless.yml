@@ -91,6 +91,20 @@ functions:
     events:
       - httpApi: '*'
 
+  queue-worker:
+    handler: artisan
+    timeout: 60
+    role: LambdaExecutionRole
+    layers:
+      - ${bref:layer.php-82}
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - SQSQueue
+              - Arn
+          batchSize: 1    
+
 custom:
   roles:
     stage: apna-management-lambda-role

@@ -56,7 +56,7 @@ class DocumentFetchJob implements ShouldQueue
                     ->exists();
 
                 if ($document_exist) {
-                    Log::info('Document already fetched: ' . $document_name, [
+                    Log::error('Document already fetched: ' . $document_name, [
                         'verification_id' => $this->verificationId,
                     ]);
                     continue;

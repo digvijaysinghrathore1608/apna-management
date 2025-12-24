@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Services;
 
 use App\Http\Controllers\BaseController as Controller;
-use App\Jobs\DigiLocker\DocumentFetchJob;
 use App\Models\DigiLocker\DigiLockerRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -54,7 +53,7 @@ class DigiLockerController extends Controller
                         'verification_id' => $digilocker_request->verification_id,
                     ]);
 
-                    DocumentFetchJob::dispatch($digilocker_request->verification_id);
+                    digilocaker_fetch_documents($digilocker_request->verification_id);
                 }
             }
 
@@ -195,7 +194,7 @@ class DigiLockerController extends Controller
                         'verification_id' => $digilocker_request->verification_id,
                     ]);
 
-                    DocumentFetchJob::dispatch($digilocker_request->verification_id);
+                    digilocaker_fetch_documents($digilocker_request->verification_id);
                 }
             }
             Log::debug('Digilocker Status Retrieved from DB: ', [

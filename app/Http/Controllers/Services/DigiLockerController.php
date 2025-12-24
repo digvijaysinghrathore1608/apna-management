@@ -15,14 +15,45 @@ class DigiLockerController extends Controller
 
     public function callback(Request $request)
     {
-        // Example params
-        $referenceId = $request->get('reference_id');
-        $status = strtolower($request->get('status'));
+        try {
+            $referenceId = $request->get('reference_id');
 
-        // show success UI
-        return view('digilocker.index', [
-            'status' => $status
-        ]);
+            $digilocker_request = DigiLockerRequest::where('verification_id', $referenceId)->first();
+
+            if (!$digilocker_request) {
+                Log::error('Digilocker Callback Error: Invalid verification_id: ' . $referenceId);
+                return view('digilocker.index', [
+                    'status' => 'error'
+                ]);
+            }
+
+            $digilocker_status_response = $this->verification_status(
+                $digilocker_request->csf_reference_id,
+                $digilocker_request->verification_id
+            );
+
+            if (!$digilocker_status_response['status']) {
+                Log::error('Digilocker Verify Account Error: ', $digilocker_status_response);
+                throw new \Exception($digilocker_status_response['message']);
+            }
+            Log::success('Digilocker Status Response: ', $digilocker_status_response);
+
+            $status = strtolower($digilocker_status_response['data']['status']);
+
+            // show success UI
+            return view('digilocker.index', [
+                'status' => $status
+            ]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Digilocker initiation failed',
+                'error' => $e->getMessage(),
+
+            ], 500);
+        }
     }
 
     public function initiate(Request $request)
@@ -61,6 +92,7 @@ class DigiLockerController extends Controller
                 Log::error('Digilocker Verify Account Error: ', $verify_response);
                 throw new \Exception($verify_response['message']);
             }
+            Log::success('Digilocker Verify Account Response: ', $verify_response);
 
             // create url flow
             $status = strtolower($verify_response['data']['status']);
@@ -77,12 +109,15 @@ class DigiLockerController extends Controller
                 Log::error('Digilocker Create URL Error: ', $create_url_response);
                 throw new \Exception($create_url_response['message']);
             }
+            Log::success('Digilocker Create URL Response: ', $create_url_response);
 
             $digilocker_request->csf_reference_id = $create_url_response['data']['reference_id'];
             $digilocker_request->csf_digilocker_status = strtolower($create_url_response['data']['status']);
             $digilocker_request->save();
 
             DB::commit();
+
+            Log::success('Digilocker Initiate Response: ', $create_url_response);
 
             return response()->json([
                 'status' => true,
@@ -95,9 +130,36 @@ class DigiLockerController extends Controller
                 'status' => false,
                 'message' => 'Digilocker initiation failed',
                 'error' => $e->getMessage(),
-            
+
             ], 500);
         }
+    }
+
+    private function verification_status(string $referenceId, string $verificationId)
+    {
+        $response = Http::withHeaders([
+            'x-client-id'     => config('services.cashfree.client_id'),
+            'x-client-secret' => config('services.cashfree.client_secret'),
+        ])->get(
+            config('services.cashfree.base_url') . '/verification/digilocker',
+            [
+                'reference_id'    => $referenceId,
+                'verification_id' => $verificationId,
+            ]
+        );
+
+        if ($response->failed()) {
+            return [
+                'status'  => false,
+                'message' => 'Cashfree Verification API failed',
+                'error'   => $response->json(),
+            ];
+        }
+
+        return [
+            'status' => true,
+            'data'   => $response->json(),
+        ];
     }
 
 

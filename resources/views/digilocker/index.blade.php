@@ -72,7 +72,7 @@
 
     @else
         <div class="icon pending">⏳</div>
-        <h2 class="pending">Verification In Progress</h2>
+        <h2 class="pending">Verification In Progress</h2> {{ $status }}
         <p>Please wait while we complete your verification.</p>
     @endif
 

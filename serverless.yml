@@ -146,7 +146,8 @@ resources:
     SQSQueue:
       Type: AWS::SQS::Queue
       Properties:
-        QueueName: apna-queue-${sls:stage}      
+        QueueName: apna-queue-${sls:stage}   
+        VisibilityTimeout: 120   
 
     DynamoDBTable:
       Type: AWS::DynamoDB::Table

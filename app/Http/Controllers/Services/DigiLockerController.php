@@ -16,33 +16,42 @@ class DigiLockerController extends Controller
     public function callback(Request $request)
     {
         try {
-            $referenceId = $request->get('reference_id');
+            $verification_id = $request->get('verification_id');
 
-            $digilocker_request = DigiLockerRequest::where('verification_id', $referenceId)->first();
+            $digilocker_request = DigiLockerRequest::where('verification_id', $verification_id)->first();
 
             if (!$digilocker_request) {
-                Log::error('Digilocker Callback Error: Invalid verification_id: ' . $referenceId);
+                Log::error('Digilocker Callback Error: Invalid verification_id: ' . $verification_id);
                 return view('digilocker.index', [
                     'status' => 'error'
                 ]);
             }
 
-            $digilocker_status_response = $this->verification_status(
-                $digilocker_request->csf_reference_id,
-                $digilocker_request->verification_id
-            );
+            if ($digilocker_request->csf_digilocker_status == 'pending' || $digilocker_request->csf_digilocker_status == 'created') {
 
-            if (!$digilocker_status_response['status']) {
-                Log::error('Digilocker Verify Account Error: ', $digilocker_status_response);
-                throw new \Exception($digilocker_status_response['message']);
+                $digilocker_status_response = $this->verification_status(
+                    $digilocker_request->csf_reference_id,
+                    $digilocker_request->verification_id
+                );
+
+                if (!$digilocker_status_response['status']) {
+                    Log::error('Digilocker Verify Account Error: ', $digilocker_status_response);
+                    throw new \Exception($digilocker_status_response['message']);
+                }
+                Log::debug('Digilocker Status Response: ', $digilocker_status_response);
+
+                $status = strtolower($digilocker_status_response['data']['status']);
+
+                $digilocker_request->csf_digilocker_status = $status;
+                $digilocker_request->csf_document_consent = $digilocker_status_response['data']['document_consent'] ?? null;
+                $digilocker_request->csf_status_response_body = json_encode($digilocker_status_response['data']);
+                $digilocker_request->save();
             }
-            Log::debug('Digilocker Status Response: ', $digilocker_status_response);
 
-            $status = strtolower($digilocker_status_response['data']['status']);
 
             // show success UI
             return view('digilocker.index', [
-                'status' => $status
+                'status' => $digilocker_request->csf_digilocker_status
             ]);
         } catch (\Throwable $e) {
             DB::rollBack();
@@ -122,7 +131,10 @@ class DigiLockerController extends Controller
 
             return response()->json([
                 'status' => true,
-                'data' => $create_url_response
+                'data' => [
+                    'verification_id' => $create_url_response['data']['verification_id'],
+                    'url' => $create_url_response['data']['url']
+                ]
             ]);
         } catch (\Throwable $e) {
             DB::rollBack();

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>DigiLocker Verification</title>
@@ -21,7 +22,7 @@
             width: 100%;
             max-width: 420px;
             border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,.08);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .08);
             text-align: center;
         }
 
@@ -53,31 +54,44 @@
         }
     </style>
 </head>
+
 <body>
 
-<div class="card">
-    @php
-        $status = $status ?? 'pending';
-    @endphp
+    <div class="card">
+        @php
+            $rawStatus = $status ?? 'pending';
 
-    @if($status === 'success')
-        <div class="icon success">✔</div>
-        <h2 class="success">Verification Successful</h2>
-        <p>Your DigiLocker verification has been completed successfully.</p>
+            if (in_array($rawStatus, ['created', 'pending'])) {
+                $uiStatus = 'pending';
+            } elseif ($rawStatus === 'authenticated') {
+                $uiStatus = 'success';
+            } else {
+                $uiStatus = 'failed';
+            }
+        @endphp
+        {{ $status }}
+        @if ($uiStatus === 'success')
+            <div class="icon success">✔</div>
+            <h2 class="success">Verification Successful</h2>
+            <p>Your DigiLocker verification has been completed successfully.</p>
+        @elseif($uiStatus === 'failed')
+            <div class="icon failed">✖</div>
+            <h2 class="failed">Verification Failed</h2>
 
-    @elseif($status === 'failed')
-        <div class="icon failed">✖</div>
-        <h2 class="failed">Verification Failed</h2>
-        <p>We could not verify your DigiLocker account.</p>
-
-    @else
-        <div class="icon pending">⏳</div>
-        <h2 class="pending">Verification In Progress</h2> {{ $status }}
-        <p>Please wait while we complete your verification.</p>
-    @endif
-
-    <a href="/" class="btn">Go to Home</a>
-</div>
+            @if ($rawStatus === 'expired')
+                <p>Your verification session has expired. Please try again.</p>
+            @elseif($rawStatus === 'consent_denied')
+                <p>You denied consent on DigiLocker.</p>
+            @else
+                <p>We could not verify your DigiLocker account.</p>
+            @endif
+        @else
+            <div class="icon pending">⏳</div>
+            <h2 class="pending">Verification In Progress</h2>
+            <p>Please wait while we complete your verification.</p>
+        @endif
+    </div>
 
 </body>
+
 </html>

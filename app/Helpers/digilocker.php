@@ -64,7 +64,6 @@ if (!function_exists('digilocker_verification_status')) {
         $response = Http::withHeaders([
             'x-client-id'     => config('services.cashfree.client_id'),
             'x-client-secret' => config('services.cashfree.client_secret'),
-            'x-cf-signature'     => get_cashfree_signature(),
         ])->get(
             config('services.cashfree.base_url') . '/verification/digilocker',
             [
@@ -159,7 +158,6 @@ if (!function_exists('csf_digilocker_get_documents')) {
         $response = Http::withHeaders([
             'x-client-id'     => config('services.cashfree.client_id'),
             'x-client-secret' => config('services.cashfree.client_secret'),
-            'x-cf-signature'     => get_cashfree_signature(),
         ])->get(
             config('services.cashfree.base_url') . '/verification/digilocker/document/' . $document_type,
             [
@@ -191,7 +189,6 @@ if (!function_exists('csf_verify_account')) {
             'Content-Type'    => 'application/json',
             'x-client-id'     => config('services.cashfree.client_id'),
             'x-client-secret' => config('services.cashfree.client_secret'),
-            'x-cf-signature'     => get_cashfree_signature(),
         ])->post(
             config('services.cashfree.base_url') . '/verification/digilocker/verify-account',
             [
@@ -223,7 +220,6 @@ if (!function_exists('csf_create_url')) {
             'Content-Type'     => 'application/json',
             'x-client-id'      => config('services.cashfree.client_id'),
             'x-client-secret' => config('services.cashfree.client_secret'),
-            'x-cf-signature'     => get_cashfree_signature(),
         ])->post(
             config('services.cashfree.base_url') . '/verification/digilocker',
             [

@@ -152,7 +152,11 @@ class EmailController extends Controller
 
             Mail::html($html, function ($mail) use ($to, $subject, $sender_name) {
                 $mail->from(env('MAIL_FROM_ADDRESS'), $sender_name);
-                $mail->to($to)->subject($subject);
+                $mail->to($to);
+                if ($to != business_setting_by_key('contact_query_receiver_mail')) {
+                    $mail->cc([business_setting_by_key('contact_query_receiver_mail')]);
+                }
+                $mail->subject($subject);
             });
 
             // ✅ SUCCESS RESPONSE

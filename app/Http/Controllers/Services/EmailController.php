@@ -97,7 +97,7 @@ class EmailController extends Controller
 
             $subject = "{$siteName} | Contact Query | {$currentTime}";
 
-            $ignoreKeys = ['_token', 'site_name'];
+            $ignoreKeys = ['_token', 'site_name', 'to', 'sender_name'];
             $rows = '';
 
             foreach ($request->all() as $key => $value) {

@@ -22,7 +22,7 @@ Route::get('/ses-test', function () {
     return 'Email sent';
 });
 
-Route::post('/services/email/send', [EmailController::class, 'send_email']);
+Route::post('/services/email/query_notify_email', [EmailController::class, 'query_notify_email']);
 
 
 

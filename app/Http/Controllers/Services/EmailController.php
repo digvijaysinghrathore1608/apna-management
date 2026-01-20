@@ -69,17 +69,20 @@ class EmailController extends Controller
         //
     }
 
-    public function send_email(Request $request)
+    public function query_notify_email(Request $request)
     {
         try {
 
             // ✅ Optional validation
             $request->validate([
                 'email' => 'nullable|email',
+                'to' => 'nullable|email',
+                'sender_name' => 'nullable|string|max:20',
             ]);
 
-
-            $to = business_setting_by_key('contact_query_receiver_mail');
+            $to = $request->to ?: business_setting_by_key('contact_query_receiver_mail');
+            $siteName = $request->site_name ?? "Contact Form";
+            $sender_name = $request->sender_name ?? env('APP_NAME');
 
             if (empty($to)) {
                 return response()->json([
@@ -88,14 +91,13 @@ class EmailController extends Controller
                 ], 404);
             }
 
-            $siteName = $request->site_name ?? "Contact Form";
             $currentTime = Carbon::now()
                 ->setTimezone('Asia/Kolkata')
                 ->format('d-m-Y H:i:s');
 
             $subject = "{$siteName} | Contact Query | {$currentTime}";
 
-            $ignoreKeys = ['_token', 'site_name'];
+            $ignoreKeys = ['_token', 'site_name', 'to', 'sender_name'];
             $rows = '';
 
             foreach ($request->all() as $key => $value) {
@@ -148,7 +150,8 @@ class EmailController extends Controller
             </div>
         ";
 
-            Mail::html($html, function ($mail) use ($to, $subject) {
+            Mail::html($html, function ($mail) use ($to, $subject, $sender_name) {
+                $mail->from(env('MAIL_FROM_ADDRESS'), $sender_name);
                 $mail->to($to)->subject($subject);
             });
 

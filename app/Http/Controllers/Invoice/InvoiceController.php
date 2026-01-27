@@ -86,7 +86,8 @@ class InvoiceController extends Controller
 
         return response()->json([
             'status' => true,
-            'invoice_url' => $invoice_url
+            'invoice_url' => $invoice_url,
+            'disk' => config('filesystems.default'),
         ]);
     }
 

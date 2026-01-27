@@ -64,7 +64,7 @@ provider:
     MAIL_FROM_NAME: ${ssm:/apna/${sls:stage}/MAIL_FROM_NAME}
 
     # Filesystem / S3
-    FILESYSTEM_DRIVER: ${ssm:/apna/${sls:stage}/FILESYSTEM_DRIVER}
+    FILESYSTEM_DISK: ${ssm:/apna/${sls:stage}/FILESYSTEM_DRIVER}
     # AWS_ACCESS_KEY_ID: ${ssm:/apna/${sls:stage}/AWS_ACCESS_KEY_ID}
     # AWS_SECRET_ACCESS_KEY: ${ssm:/apna/${sls:stage}/AWS_SECRET_ACCESS_KEY}
     # AWS_DEFAULT_REGION: ${ssm:/apna/${sls:stage}/AWS_DEFAULT_REGION}

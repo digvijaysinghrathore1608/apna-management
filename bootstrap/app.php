@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         api: [
             __DIR__ . '/../routes/api.php',
             __DIR__ . '/../routes/digilocker.php',
+            __DIR__ . '/../routes/invoice.php',
         ],
         commands: __DIR__ . '/../routes/console.php',
         health: '/up',

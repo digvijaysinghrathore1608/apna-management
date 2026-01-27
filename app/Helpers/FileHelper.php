@@ -1,18 +1,17 @@
 <?php
 
-namespace App\Helpers;
-
 use Illuminate\Support\Facades\Storage;
 
-class FileHelper
-{
-    public static function upload($file, $path)
+if (!function_exists('file_upload')) {
+    function file_upload($file, $path)
     {
         $disk = config('filesystems.default');
         return $file->store($path, $disk);
     }
+}
 
-    public static function getUrl($path)
+if (!function_exists('file_get_url')) {
+    function file_get_url($path)
     {
         if (!$path) return null;
 
@@ -24,8 +23,10 @@ class FileHelper
 
         return Storage::url($path);
     }
+}
 
-    public static function delete($path)
+if (!function_exists('file_delete')) {
+    function file_delete($path)
     {
         if (!$path) return;
         $disk = config('filesystems.default');

@@ -31,7 +31,8 @@ class SuperAdminSeeder extends Seeder
             'welcome',
             'microfinance',
             'services',
-            'digilocker'
+            'digilocker',
+            'invoice',
         ];
         $serviceIds = [];
         foreach ($services as $serviceName) {

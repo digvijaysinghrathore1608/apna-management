@@ -77,7 +77,7 @@ class EmailController extends Controller
             $request->validate([
                 'email' => 'nullable|email',
                 'to' => 'nullable|email',
-                'sender_name' => 'nullable|string|max:20',
+                'sender_name' => 'nullable|string|max:100',
             ]);
 
             $to = $request->to ?: business_setting_by_key('contact_query_receiver_mail');

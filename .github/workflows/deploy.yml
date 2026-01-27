@@ -96,5 +96,5 @@ jobs:
         run: php artisan migrate --force
 
       - name: Run Seed
-        if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/stage') }}  
+        if: ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.confirm_migration == 'YES') ||(github.event_name == 'push' && github.ref == 'refs/heads/stage') }}  
         run: php artisan db:seed --class=SuperAdminSeeder

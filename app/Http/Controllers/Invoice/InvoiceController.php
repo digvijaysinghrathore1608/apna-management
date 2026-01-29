@@ -13,11 +13,20 @@ class InvoiceController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return Invoice::with('template')
+        $search = $request->query('search');
+
+        $invoices = Invoice::with('template')
+            ->when($search, function ($q) use ($search) {
+                $q->where('invoice_number', 'like', "%{$search}%")
+                    ->orWhere('customer_name', 'like', "%{$search}%")
+                    ->orWhere('status', 'like', "%{$search}%");
+            })
             ->latest()
             ->paginate(10);
+
+        return $invoices;
     }
 
     /**

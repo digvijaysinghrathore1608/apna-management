@@ -76,11 +76,39 @@ class EmailController extends Controller
             // ✅ Optional validation
             $request->validate([
                 'email' => 'nullable|email',
-                'to' => 'nullable|email',
                 'sender_name' => 'nullable|string|max:100',
             ]);
 
             $to = $request->to ?: business_setting_by_key('contact_query_receiver_mail');
+
+            if (empty($to)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Receiver email not found',
+                ], 404);
+            }
+
+            // ✅ Convert to array + clean
+            $toEmails = collect(is_array($to) ? $to : explode(',', $to))
+                ->map(fn($email) => trim($email))
+                ->filter()
+                ->unique()
+                ->values()
+                ->toArray();
+
+            // ✅ Validate each email
+            validator(['to' => $toEmails], [
+                'to.*' => 'email'
+            ])->validate();
+
+            // ✅ CC emails
+            $ccEmails = collect(explode(',', business_setting_by_key('contact_query_receiver_mail')))
+                ->map(fn($email) => trim($email))
+                ->filter()
+                ->unique()
+                ->values()
+                ->toArray();
+
             $siteName = $request->site_name ?? "Contact Form";
             $sender_name = $request->sender_name ?? env('APP_NAME');
 
@@ -149,19 +177,7 @@ class EmailController extends Controller
                 </table>
             </div>
         ";
-            $toEmails = is_array($to) ? $to : array_map('trim', explode(',', $to));
-
-            $ccEmail = business_setting_by_key('contact_query_receiver_mail');
-            $ccEmails = $ccEmail ? array_map('trim', explode(',', $ccEmail)) : [];
-
-            // Mail::html($html, function ($mail) use ($to, $subject, $sender_name) {
-            //     $mail->from(env('MAIL_FROM_ADDRESS'), $sender_name);
-            //     $mail->to($to);
-            //     if ($to != business_setting_by_key('contact_query_receiver_mail')) {
-            //         $mail->cc([business_setting_by_key('contact_query_receiver_mail')]);
-            //     }
-            //     $mail->subject($subject);
-            // });
+        
             Mail::html($html, function ($mail) use ($toEmails, $ccEmails, $subject, $sender_name) {
                 $mail->from(env('MAIL_FROM_ADDRESS'), $sender_name);
                 $mail->to($toEmails);

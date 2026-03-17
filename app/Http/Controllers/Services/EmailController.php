@@ -149,13 +149,27 @@ class EmailController extends Controller
                 </table>
             </div>
         ";
+            $toEmails = is_array($to) ? $to : array_map('trim', explode(',', $to));
 
-            Mail::html($html, function ($mail) use ($to, $subject, $sender_name) {
+            $ccEmail = business_setting_by_key('contact_query_receiver_mail');
+            $ccEmails = $ccEmail ? array_map('trim', explode(',', $ccEmail)) : [];
+
+            // Mail::html($html, function ($mail) use ($to, $subject, $sender_name) {
+            //     $mail->from(env('MAIL_FROM_ADDRESS'), $sender_name);
+            //     $mail->to($to);
+            //     if ($to != business_setting_by_key('contact_query_receiver_mail')) {
+            //         $mail->cc([business_setting_by_key('contact_query_receiver_mail')]);
+            //     }
+            //     $mail->subject($subject);
+            // });
+            Mail::html($html, function ($mail) use ($toEmails, $ccEmails, $subject, $sender_name) {
                 $mail->from(env('MAIL_FROM_ADDRESS'), $sender_name);
-                $mail->to($to);
-                if ($to != business_setting_by_key('contact_query_receiver_mail')) {
-                    $mail->cc([business_setting_by_key('contact_query_receiver_mail')]);
+                $mail->to($toEmails);
+
+                if (!empty($ccEmails)) {
+                    $mail->cc($ccEmails);
                 }
+
                 $mail->subject($subject);
             });
 
